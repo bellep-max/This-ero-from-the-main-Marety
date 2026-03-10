@@ -1,7 +1,8 @@
 <script setup>
+import apiClient from "@/api/client";
 import { BTab, BTabs } from 'bootstrap-vue-next';
 import { $t } from '@/i18n';
-import { defineAsyncComponent, onBeforeMount, ref } from 'vue';
+import { defineAsyncComponent, onBeforeMount, ref, onMounted } from 'vue';
 import { isNotEmpty } from '@/Services/MiscService.js';
 import ImageLinkTypes from '@/Enums/ImageLinkTypes.js';
 const SongBlockCarousel = defineAsyncComponent(() => import('@/Components/Carousels/SongBlockCarousel.vue'));
@@ -13,47 +14,42 @@ const GenreBlockCarousel = defineAsyncComponent(() => import('@/Components/Carou
 import indexImage from '@/assets/images/homepage.webp';
 import route from "@/helpers/route"
 
-const props = defineProps({
-    newAudios: {
-        type: Object,
-        required: false,
-        default: {},
-    },
-    popularAudios: {
-        type: Object,
-        required: false,
-        default: {},
-    },
-    genres: {
-        type: Object,
-        required: false,
-        default: {},
-    },
-    adventures: {
-        type: Object,
-        required: false,
-        default: {},
-    },
-    posts: {
-        type: Object,
-        required: false,
-        default: {},
-    },
-});
+const newAudios = ref(null);
+const popularAudios = ref(null);
+const genres = ref(null);
+const adventures = ref(null);
+const posts = ref(null);
+const loading = ref(true);
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get('/homepage');
+      const apiData = response.data;
+      newAudios.value = apiData.newAudios ?? null;
+    popularAudios.value = apiData.popularAudios ?? null;
+    genres.value = apiData.genres ?? null;
+    adventures.value = apiData.adventures ?? null;
+    posts.value = apiData.posts ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const hasContent = (contentBlockName) => {
     if (contentBlockName === 'newAudios') {
         return true;
-        // return props.newAudios.length > 0;
+        // return newAudios.length > 0;
     } else if (contentBlockName === 'popularAudios') {
-        return isNotEmpty(props.popularAudios);
+        return isNotEmpty(popularAudios.value);
     } else if (contentBlockName === 'posts') {
-        return isNotEmpty(props.posts);
+        return isNotEmpty(posts.value);
     } else if (contentBlockName === 'adventures') {
-        return isNotEmpty(props.adventures);
+        return isNotEmpty(adventures.value);
     }
 
-    return isNotEmpty(props.genres);
+    return isNotEmpty(genres.value);
 };
 
 const testimonials = ref([]);
@@ -76,6 +72,10 @@ onBeforeMount(() => {
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     <div class="container-fluid p-0">
         <div class="d-flex flex-row justify-content-between align-items-center">
             <div class="d-flex flex-column justify-content-center align-items-start p-2 ps-lg-8">
@@ -183,3 +183,4 @@ onBeforeMount(() => {
         </div>
     </div>
 </template>
+  </template>

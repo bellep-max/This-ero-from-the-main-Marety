@@ -8,24 +8,32 @@ import { isNotEmpty } from '@/Services/MiscService.js';
 const UserLayout = defineAsyncComponent(() => import('@/Layouts/UserLayout.vue'));
 const NotificationFullCard = defineAsyncComponent(() => import('@/Components/Cards/NotificationFullCard.vue'));
 
-const props = defineProps({
-    user: {
-        required: true,
-        type: Object,
-    },
-    notifications: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-    recent_activities: {
-        type: Object,
-        default: {},
-    },
-});
+const user = ref(null);
+const notifications = ref(null);
+const recent_activities = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/users/${currentRoute.params.username}/notifications`);
+      const apiData = response.data;
+      user.value = apiData.user ?? null;
+    notifications.value = apiData.notifications ?? null;
+    recent_activities.value = apiData.recent_activities ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :title="$t('pages.user.notifications.my_notifications')" :user="user" :overflow="false">
         <BTabs
@@ -63,3 +71,4 @@ const props = defineProps({
         </BTabs>
     </UserLayout>
 </template>
+  </template>

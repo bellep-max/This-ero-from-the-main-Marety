@@ -8,15 +8,22 @@ const SettingsLayout = defineAsyncComponent(() => import('@/Layouts/SettingsLayo
 const DefaultButton = defineAsyncComponent(() => import('@/Components/Buttons/DefaultButton.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    subscription: {
-        required: true,
-    },
-    plans: {
-        type: Object,
-        default: {},
-    },
-});
+const subscription = ref(null);
+const plans = ref(null);
+const loading = ref(true);
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get('/settings/subscription');
+      const apiData = response.data;
+      subscription.value = apiData.subscription ?? null;
+    plans.value = apiData.plans ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const submit = () => {
     form.patch(route('subscription.update'), {
@@ -43,11 +50,15 @@ const cancelSubscription = () => {
 };
 
 const subscriptionActionName = computed(() =>
-    props.subscription.status === 'active' ? $t('buttons.suspend_subscription') : $t('buttons.activate_subscription'),
+    subscription.value?.status === 'active' ? $t('buttons.suspend_subscription') : $t('buttons.activate_subscription'),
 );
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <SettingsLayout :title="$t('menus.user_settings.subscription')">
         <div class="d-flex flex-column justify-content-center align-items-center gap-4">
@@ -55,7 +66,7 @@ const subscriptionActionName = computed(() =>
             <template v-if="subscription">
                 <DefaultButton
                     class-list="btn-pink btn-wide"
-                    @click="props.subscription.status === 'active' ? suspendSubscription() : activateSubscription()"
+                    @click="subscription.status === 'active' ? suspendSubscription() : activateSubscription()"
                 >
                     {{ subscriptionActionName }}
                 </DefaultButton>
@@ -81,3 +92,4 @@ const subscriptionActionName = computed(() =>
         </div>
     </SettingsLayout>
 </template>
+  </template>

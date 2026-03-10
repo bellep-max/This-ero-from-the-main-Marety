@@ -1,18 +1,31 @@
 <script setup>
+import apiClient from "@/api/client";
 import { $t } from '@/i18n.js';
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, ref, onMounted } from 'vue';
 const ImageCard = defineAsyncComponent(() => import('@/Components/Cards/ImageCard.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    genres: {
-        type: Array,
-        default: [],
-    },
-});
+const genres = ref(null);
+const loading = ref(true);
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get('/genres');
+      const apiData = response.data;
+      genres.value = apiData.genres ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     <div class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100">
         <div class="container">
             <div class="row">
@@ -42,3 +55,4 @@ const props = defineProps({
         </div>
     </div>
 </template>
+  </template>

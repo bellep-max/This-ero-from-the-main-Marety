@@ -1,0 +1,1 @@
+import{a as s}from"./index-BeVQDSRe.js";import{P as i}from"./auth-BZbwYP22.js";const u=async a=>{await s.post(i.SONGS(a.playlist_uuid),{song_uuid:a.song_uuid})},d=async a=>{await s.delete(i.SONGS(a.playlist_uuid),{data:{song_uuid:a.song_uuid}})};export{u as a,d as r};

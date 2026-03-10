@@ -12,16 +12,25 @@ const Icon = defineAsyncComponent(() => import('@/Components/Icons/Icon.vue'));
 const DefaultButton = defineAsyncComponent(() => import('@/Components/Buttons/DefaultButton.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    podcast: {
-        type: Object,
-        default: {},
-    },
-});
+const podcast = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/podcasts/${currentRoute.params.uuid}/edit`);
+      const apiData = response.data;
+      podcast.value = apiData.podcast ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const defaultArtworkLink = '/assets/images/podcast.png';
 
-const artworkPreview = ref(props.podcast.artwork);
+const artworkPreview = ref(podcast.value?.artwork);
 const artworkSelected = ref(false);
 
 const authStore = useAuthStore();
@@ -34,16 +43,16 @@ const categories = ref(authStore.filter_presets.categories);
 const form = useForm({
     _method: 'patch',
     artwork: null,
-    tags: props.podcast.tags ?? [],
-    title: props.podcast.title,
-    description: props.podcast.description,
-    is_visible: props.podcast.is_visible,
-    allow_comments: props.podcast.allow_comments,
-    allow_download: props.podcast.allow_download,
-    explicit: props.podcast.explicit,
-    categories: props.podcast.categories ?? [],
-    language_id: props.podcast.language_id,
-    country_id: props.podcast.country_id,
+    tags: podcast.value?.tags ?? [],
+    title: podcast.value?.title,
+    description: podcast.value?.description,
+    is_visible: podcast.value?.is_visible,
+    allow_comments: podcast.value?.allow_comments,
+    allow_download: podcast.value?.allow_download,
+    explicit: podcast.value?.explicit,
+    categories: podcast.value?.categories ?? [],
+    language_id: podcast.value?.language_id,
+    country_id: podcast.value?.country_id,
 });
 
 const resetArtwork = () => {
@@ -70,7 +79,7 @@ const addTag = (tag) => {
 };
 
 const submit = () => {
-    form.transform(removeEmptyObjectsKeys).post(route('podcasts.update', props.podcast), {
+    form.transform(removeEmptyObjectsKeys).post(route('podcasts.update', podcast.value), {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
@@ -93,6 +102,10 @@ watch(
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :user="podcast.user">
         <div class="d-flex flex-column gap-3">
@@ -188,3 +201,4 @@ watch(
         </div>
     </UserLayout>
 </template>
+  </template>

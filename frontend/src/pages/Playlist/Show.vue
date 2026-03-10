@@ -38,34 +38,42 @@ import route from "@/helpers/route"
 const audioPlayer = useAudioPlayerStore();
 const vfm = useVfm();
 
-const props = defineProps({
-    playlist: {
-        type: Object,
-        default: {},
-    },
-    following: {
-        type: Array,
-        default: [],
-    },
-    related: {
-        type: Array,
-        default: [],
-    },
-    comments: {
-        type: Array,
-    },
-});
+const playlist = ref(null);
+const following = ref(null);
+const related = ref(null);
+const comments = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
 
-const isSubscribed = ref(props.playlist.favorite);
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/playlists/${currentRoute.params.uuid}`);
+      const apiData = response.data;
+      playlist.value = apiData.playlist ?? null;
+    following.value = apiData.following ?? null;
+    related.value = apiData.related ?? null;
+    comments.value = apiData.comments ?? null;
+    if (playlist.value) {
+      isSubscribed.value = playlist.value.favorite ?? false;
+      playlistSongs.value = playlist.value.songs ? JSON.parse(JSON.stringify(playlist.value.songs)) : [];
+    }
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
-const playlistSongs = ref(JSON.parse(JSON.stringify(props.playlist.songs)));
+const isSubscribed = ref(false);
 
-const ownPlaylist = computed(() => props.playlist.user.own_profile);
-const isEditable = computed(() => props.playlist.is_editable);
+const playlistSongs = ref([]);
+
+const ownPlaylist = computed(() => playlist.value?.user.own_profile);
+const isEditable = computed(() => playlist.value?.is_editable);
 const user = computed(() => useAuthStore().user);
 
 const setCollaboration = (bool) => {
-    apiClient.post(route('playlists.collab.set', props.playlist.uuid), {
+    apiClient.post(route('playlists.collab.set', playlist.value?.uuid), {
         collaboration: bool,
     });
 };
@@ -74,13 +82,13 @@ const openDeleteModal = () =>
     useModal({
         component: ConfirmDeletionModal,
         attrs: {
-            title: props.playlist.title,
+            title: playlist.value?.title,
             type: ObjectTypes.Playlist,
             onClose() {
                 vfm.close('delete-modal');
             },
             onConfirm() {
-                apiClient.delete(route('playlists.destroy', props.playlist.uuid));
+                apiClient.delete(route('playlists.destroy', playlist.value?.uuid));
                 vfm.close('delete-modal');
             },
         },
@@ -92,8 +100,8 @@ const openInviteModal = () =>
     useModal({
         component: InviteCollaboratorsModal,
         attrs: {
-            playlist_uuid: props.playlist.uuid,
-            following: props.following,
+            playlist_uuid: playlist.value?.uuid,
+            following: following.value,
             onClose() {
                 vfm.close('invite-collab-modal');
             },
@@ -137,14 +145,22 @@ const openReportModal = (item, type) =>
         escToClose: true,
     }).open();
 
-const updateComments = () => {
-    router.reload({
-        only: ['comments'],
-    });
+const updateComments = async () => {
+  try {
+    const response = await apiClient.get(currentRoute.path.replace(/^\//, ''));
+    const apiData = response.data;
+    if (apiData.comments) comments.value = apiData.comments;
+  } catch (error) {
+    console.error('Failed to refresh comments:', error);
+  }
 };
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :user="playlist.user">
         <div class="d-flex flex-column gap-3">
@@ -355,3 +371,4 @@ const updateComments = () => {
         </template>
     </UserLayout>
 </template>
+  </template>

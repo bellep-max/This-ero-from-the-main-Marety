@@ -1,47 +1,50 @@
 <script setup>
+import apiClient from "@/api/client";
 import { BTab, BTabs } from 'bootstrap-vue-next';
 import { $t } from '@/i18n';
 import SongBlockCarousel from '@/Components/Carousels/SongBlockCarousel.vue';
 import MainPageBlock from '@/Components/Sections/MainPageBlock.vue';
 import ImageCarousel from '@/Components/Carousels/ImageCarousel.vue';
 import TestimonialCarousel from '@/Components/Carousels/TestimonialCarousel.vue';
-import { computed } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 import route from "@/helpers/route"
 
-const props = defineProps({
-    popularAudios: {
-        type: Object,
-        required: true,
-    },
-    topGenre: {
-        type: Object,
-        required: true,
-    },
-    topFemale: {
-        type: Object,
-        required: true,
-    },
-    topMale: {
-        type: Object,
-        required: true,
-    },
-});
+const popularAudios = ref(null);
+const topGenre = ref(null);
+const topFemale = ref(null);
+const topMale = ref(null);
+const loading = ref(true);
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get('/trending');
+      const apiData = response.data;
+      popularAudios.value = apiData.popularAudios ?? null;
+    topGenre.value = apiData.topGenre ?? null;
+    topFemale.value = apiData.topFemale ?? null;
+    topMale.value = apiData.topMale ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const hasContent = (contentBlockName) => {
     if (contentBlockName === 'top20') {
-        return props.topFemale.length > 0 || props.topMale.length > 0;
+        return (topFemale.value?.length ?? 0) > 0 || (topMale.value?.length ?? 0) > 0;
     } else if (contentBlockName === 'popularAudios') {
-        return props.popularAudios.length > 0;
+        return (popularAudios.value?.length ?? 0) > 0;
     } else if (contentBlockName === 'topGenre') {
-        return props.topGenre.length > 0;
+        return (topGenre.value?.length ?? 0) > 0;
     } else if (contentBlockName === 'topFemale') {
-        return props.topFemale.length > 0;
+        return (topFemale.value?.length ?? 0) > 0;
     }
 
-    return props.topMale.length > 0;
+    return (topMale.value?.length ?? 0) > 0;
 };
 
-const top20 = computed(() => props.topFemale.concat(props.topMale));
+const top20 = computed(() => [...(topFemale.value ?? []), ...(topMale.value ?? [])]);
 
 // const testimonials = ref([]);
 //
@@ -63,6 +66,10 @@ const top20 = computed(() => props.topFemale.concat(props.topMale));
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     <div class="min-vh-100 d-flex flex-column gap-5">
         <div class="py-3 p-md-5 p-lg-6">
             <div class="container">
@@ -156,5 +163,6 @@ const top20 = computed(() => props.topFemale.concat(props.topMale));
         <!--      </div>-->
     </div>
 </template>
+  </template>
 
 <style scoped></style>

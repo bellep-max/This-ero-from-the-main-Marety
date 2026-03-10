@@ -15,16 +15,23 @@ const Icon = defineAsyncComponent(() => import('@/Components/Icons/Icon.vue'));
 const UserLayout = defineAsyncComponent(() => import('@/Layouts/UserLayout.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    adventure: {
-        type: Object,
-        default: {},
-    },
-    user: {
-        type: Object,
-        default: {},
-    },
-});
+const adventure = ref(null);
+const user = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/adventures/${currentRoute.params.uuid}/edit`);
+      const apiData = response.data;
+      adventure.value = apiData.adventure ?? null;
+    user.value = apiData.user ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const authStore = useAuthStore();
 
@@ -32,25 +39,25 @@ const genres = ref(authStore.filter_presets.genres);
 const tags = ref(authStore.filter_presets.tags);
 
 const maxAllowed = 60;
-const titleLength = ref(props.adventure.title?.length ?? 0);
+const titleLength = ref(adventure.value?.title?.length ?? 0);
 const inputAllowed = ref(true);
 
-const artworkPreview = ref(props.adventure.artwork);
+const artworkPreview = ref(adventure.value?.artwork);
 
 const form = useForm({
     _method: 'PATCH',
-    title: props.adventure.title,
-    tags: props.adventure.tags,
-    genres: props.adventure.genres,
-    is_visible: props.adventure.is_visible,
-    allow_comments: props.adventure.allow_comments,
-    allow_download: props.adventure.allow_download,
-    description: props.adventure.description,
+    title: adventure.value?.title,
+    tags: adventure.value?.tags,
+    genres: adventure.value?.genres,
+    is_visible: adventure.value?.is_visible,
+    allow_comments: adventure.value?.allow_comments,
+    allow_download: adventure.value?.allow_download,
+    description: adventure.value?.description,
     artwork: null,
 });
 
 const setImagePreview = () => {
-    artworkPreview.value = form.artwork ? URL.createObjectURL(form.artwork) : props.song.artwork;
+    artworkPreview.value = form.artwork ? URL.createObjectURL(form.artwork) : song.artwork;
 };
 
 const addTag = (tag) => {
@@ -71,14 +78,14 @@ const checkLength = () => {
 const { open, close } = useModal({
     component: ConfirmDeletionModal,
     attrs: {
-        title: props.adventure.title,
+        title: adventure.value?.title,
         type: ObjectTypes.Adventure,
         onClose() {
             close();
         },
         onConfirm() {
             close();
-            apiClient.delete(route('adventures.destroy', props.adventure));
+            apiClient.delete(route('adventures.destroy', adventure.value));
         },
     },
     clickToClose: true,
@@ -86,13 +93,17 @@ const { open, close } = useModal({
 });
 
 const submit = () => {
-    form.transform(removeEmptyObjectsKeys).post(route('adventures.update', props.adventure), {
+    form.transform(removeEmptyObjectsKeys).post(route('adventures.update', adventure.value), {
         preserveScroll: true,
     });
 };
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :user="user">
         <div class="row gy-3">
@@ -303,3 +314,4 @@ const submit = () => {
         </div>
     </UserLayout>
 </template>
+  </template>

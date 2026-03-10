@@ -14,24 +14,27 @@ const DefaultLink = defineAsyncComponent(() => import('@/Components/Links/Defaul
 const DefaultButton = defineAsyncComponent(() => import('@/Components/Buttons/DefaultButton.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    genre: {
-        type: Object,
-        default: {},
-    },
-    slides: {
-        type: Array,
-        default: [],
-    },
-    channels: {
-        type: Array,
-        default: [],
-    },
-    related: {
-        type: Array,
-        default: [],
-    },
-});
+const genre = ref(null);
+const slides = ref(null);
+const channels = ref(null);
+const related = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/genres/${currentRoute.params.slug}`);
+      const apiData = response.data;
+      genre.value = apiData.genre ?? null;
+    slides.value = apiData.slides ?? null;
+    channels.value = apiData.channels ?? null;
+    related.value = apiData.related ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const authStore = useAuthStore();
 
@@ -55,7 +58,7 @@ const loadMore = (type) => {
                     // Assuming you have a `songs` ref in your component
                     songs.value.data = [...songs.value.data, ...authStore.songs.data];
 
-                    // Update the pagination metadata with the new data from the server
+                    // Update the pagination.value metadata with the new data from the server
                     songs.value.links = authStore.songs.links;
                     songs.value.meta = authStore.songs.meta;
 
@@ -75,7 +78,7 @@ const loadMore = (type) => {
                     // Assuming you have a `songs` ref in your component
                     adventures.value.data = [...adventures.value.data, ...authStore.adventures.data];
 
-                    // Update the pagination metadata with the new data from the server
+                    // Update the pagination.value metadata with the new data from the server
                     adventures.value.links = authStore.adventures.links;
                     adventures.value.meta = authStore.adventures.meta;
 
@@ -102,6 +105,10 @@ onMounted(() => {
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     <div class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100">
         <div class="container">
             <div class="row">
@@ -189,3 +196,4 @@ onMounted(() => {
         </div>
     </div>
 </template>
+  </template>

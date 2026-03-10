@@ -24,26 +24,31 @@ import route from "@/helpers/route"
 const vfm = useVfm();
 const audioPlayer = useAudioPlayerStore();
 
-const props = defineProps({
-    podcast: {
-        type: Object,
-        required: true,
-    },
-    episodes: {
-        type: Array,
-        required: true,
-    },
-    season: {
-        type: Number,
-        required: true,
-    },
-});
+const podcast = ref(null);
+const episodes = ref(null);
+const season = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
 
-const seasonSongs = ref(JSON.parse(JSON.stringify(props.episodes)));
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/podcasts/${currentRoute.params.uuid}/seasons/${currentRoute.params.seasonUuid}`);
+      const apiData = response.data;
+      podcast.value = apiData.podcast ?? null;
+    episodes.value = apiData.episodes ?? null;
+    season.value = apiData.season ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
-const isOwned = ref(isOwner(props.podcast.user.uuid));
+const seasonSongs = ref(JSON.parse(JSON.stringify(episodes.value)));
 
-const isSubscribed = computed(() => props.podcast.favorite);
+const isOwned = ref(isOwner(podcast.value?.user.uuid));
+
+const isSubscribed = computed(() => podcast.value?.favorite);
 const user = computed(() => useAuthStore().user);
 
 const openShareModal = (title, item) =>
@@ -82,6 +87,10 @@ const openReportModal = (item, type) =>
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :user="podcast.user">
         <div class="d-flex flex-column gap-3">
@@ -216,3 +225,4 @@ const openReportModal = (item, type) =>
         </template>
     </UserLayout>
 </template>
+  </template>

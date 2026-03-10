@@ -8,31 +8,38 @@ import { isNotEmpty } from '@/Services/MiscService.js';
 const UserLayout = defineAsyncComponent(() => import('@/Layouts/UserLayout.vue'));
 const FollowerCard = defineAsyncComponent(() => import('@/Components/Cards/FollowerCard.vue'));
 
-const props = defineProps({
-    user: {
-        required: true,
-        type: Object,
-    },
-    patrons: {
-        required: true,
-        type: Array,
-        default: [],
-    },
-    free_followers: {
-        required: true,
-        type: Array,
-        default: [],
-    },
-});
+const user = ref(null);
+const patrons = ref(null);
+const free_followers = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/users/${currentRoute.params.username}/followers`);
+      const apiData = response.data;
+      user.value = apiData.user ?? null;
+    patrons.value = apiData.patrons ?? null;
+    free_followers.value = apiData.free_followers ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const pageTitle = computed(() =>
-    props.user.own_profile
+    user.value?.own_profile
         ? $t('pages.user.followers.my')
-        : $t('pages.user.followers.other', { name: props.user.name }),
+        : $t('pages.user.followers.other', { name: user.value?.name }),
 );
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :title="pageTitle" :user="user" :overflow="false">
         <BTabs
@@ -71,3 +78,4 @@ const pageTitle = computed(() =>
         </template>
     </UserLayout>
 </template>
+  </template>

@@ -17,22 +17,28 @@ import route from "@/helpers/route"
 
 const vfm = useVfm();
 
-const props = defineProps({
-    user: {
-        required: true,
-        type: Object,
-    },
-    podcasts: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-});
+const user = ref(null);
+const podcasts = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/users/${currentRoute.params.username}/podcasts`);
+      const apiData = response.data;
+      user.value = apiData.user ?? null;
+    podcasts.value = apiData.podcasts ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const currentUser = computed(() => useAuthStore().user);
-const canUpload = computed(() => props.user.own_profile && currentUser.value.can_upload);
+const canUpload = computed(() => user.value?.own_profile && currentUser.value.can_upload);
 const pageTitle = computed(() =>
-    props.user.own_profile ? $t('pages.user.my_podcasts') : $t('pages.user.user_podcasts', { name: props.user.name }),
+    user.value?.own_profile ? $t('pages.user.my_podcasts') : $t('pages.user.user_podcasts', { name: user.value?.name }),
 );
 
 const openPodcastCreateModal = () => {
@@ -69,6 +75,10 @@ const openPodcastUploadModal = () => {
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :title="pageTitle" :user="user">
         <template v-if="canUpload" #controls>
@@ -97,3 +107,4 @@ const openPodcastUploadModal = () => {
         </div>
     </UserLayout>
 </template>
+  </template>

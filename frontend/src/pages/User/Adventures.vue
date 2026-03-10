@@ -11,31 +11,41 @@ const UserLayout = defineAsyncComponent(() => import('@/Layouts/UserLayout.vue')
 const DefaultButton = defineAsyncComponent(() => import('@/Components/Buttons/DefaultButton.vue'));
 const Adventure = defineAsyncComponent(() => import('@/Components/Adventure.vue'));
 
-const props = defineProps({
-    user: {
-        required: true,
-        type: Object,
-    },
-    adventures: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-});
+const user = ref(null);
+const adventures = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/users/${currentRoute.params.username}/adventures`);
+      const apiData = response.data;
+      user.value = apiData.user ?? null;
+    adventures.value = apiData.adventures ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const authStore = useAuthStore();
 
 const showAdventureModal = ref(false);
 
-const canUpload = computed(() => props.user.own_profile && authStore.user.can_upload);
+const canUpload = computed(() => user.value?.own_profile && authStore.user.can_upload);
 const pageTitle = computed(() =>
-    props.user.own_profile
+    user.value?.own_profile
         ? $t('pages.user.my_adventures')
-        : $t('pages.user.user_adventures', { name: props.user.name }),
+        : $t('pages.user.user_adventures', { name: user.value?.name }),
 );
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :title="pageTitle" :user="user">
         <template v-if="canUpload" #controls>
@@ -61,3 +71,4 @@ const pageTitle = computed(() =>
     </UserLayout>
     <AdventureUploadModal v-model="showAdventureModal" @close="showAdventureModal = false" />
 </template>
+  </template>

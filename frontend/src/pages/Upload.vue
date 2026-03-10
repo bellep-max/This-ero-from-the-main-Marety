@@ -17,16 +17,22 @@ import route from "@/helpers/route"
 
 const vfm = useVfm();
 
-const props = defineProps({
-    plan: {
-        type: Object,
-        default: {},
-    },
-    genres: {
-        type: Array,
-        default: [],
-    },
-});
+const plan = ref(null);
+const genres = ref(null);
+const loading = ref(true);
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get('/uploads');
+      const apiData = response.data;
+      plan.value = apiData.plan ?? null;
+    genres.value = apiData.genres ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const showTrackModal = ref(false);
 const showAdventureModal = ref(false);
@@ -64,11 +70,15 @@ const openPodcastModal = () => {
     }
 };
 
-const parsedPlanPrice = computed(() => `$${props.plan.price}`);
+const parsedPlanPrice = computed(() => `$${plan.value?.price ?? '0'}`);
 const currentUser = computed(() => useAuthStore().user);
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     <div class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100">
         <div class="container">
             <div class="row">
@@ -131,3 +141,4 @@ const currentUser = computed(() => useAuthStore().user);
     <TrackUploadModal v-model="showTrackModal" />
     <AdventureUploadModal v-model="showAdventureModal" @close="showAdventureModal = false" />
 </template>
+  </template>

@@ -6,26 +6,42 @@ import apiClient from '@/api/client'
 const CommentsSection = defineAsyncComponent(() => import('@/Components/Sections/CommentsSection.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    post: {
-        type: Object,
-        default: {},
-    },
-    comments: {
-        type: Array,
-    },
-});
+const post = ref(null);
+const comments = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
 
-const updateComments = () => {
-    router.reload({
-        only: ['comments'],
-    });
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/blog/${currentRoute.params.slug}`);
+      const apiData = response.data;
+      post.value = apiData.post ?? null;
+    comments.value = apiData.comments ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
+
+const updateComments = async () => {
+  try {
+    const response = await apiClient.get(currentRoute.path.replace(/^\//, ''));
+    const apiData = response.data;
+    if (apiData.comments) comments.value = apiData.comments;
+  } catch (error) {
+    console.error('Failed to refresh comments:', error);
+  }
 };
 
-const content = computed(() => (props.post.full_content ? props.post.full_content : props.post.short_content));
+const content = computed(() => (post.full_content ? post.value?.full_content : post.value?.short_content));
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     <div class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100">
         <div class="container d-flex flex-column gap-4">
             <div class="row">
@@ -61,5 +77,6 @@ const content = computed(() => (props.post.full_content ? props.post.full_conten
         </div>
     </div>
 </template>
+  </template>
 
 <style scoped></style>

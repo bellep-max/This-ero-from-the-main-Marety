@@ -1,8 +1,7 @@
 <script setup>
 import { $t } from '../i18n.js';
-import { defineAsyncComponent, onMounted, ref, reactive } from 'vue';
+import { defineAsyncComponent, onMounted, ref, watch } from 'vue';
 import { useForm } from '@/helpers/useForm'
-import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import apiClient from '@/api/client'
 import {
@@ -29,39 +28,31 @@ import '@vueform/multiselect/themes/default.css';
 import { addToPlaylist } from '@/Services/PlaylistService.js';
 import route from "@/helpers/route"
 
-const props = defineProps({
-    filters: {
-        type: Object,
-        required: true,
-    },
-    song_max_duration: {
-        type: Number,
-        default: 0,
-    },
-});
+const loading = ref(true);
+const song_max_duration = ref(3600);
 
 const authStore = useAuthStore();
-const user = useAuthStore().user;
+const user = authStore.user;
 
-const genres = ref(authStore.filter_presets.genres);
-const tags = ref(authStore.filter_presets.tags);
-const vocals = ref(authStore.filter_presets.vocals);
+const genres = ref([]);
+const tags = ref([]);
+const vocals = ref([]);
 
 const hasFilters = ref(false);
 const showFilters = ref(false);
 const isLastSongPage = ref(false);
 const isLastAdventurePage = ref(false);
-const filteredTags = ref(tags);
+const filteredTags = ref([]);
 
-const songs = ref([]);
-const adventures = ref([]);
+const songs = ref({ data: [], meta: {}, links: {} });
+const adventures = ref({ data: [], meta: {}, links: {} });
 
 const form = useForm({
     genres: [],
     vocals: [],
-    duration: [0, props.song_max_duration],
+    duration: [0, song_max_duration.value],
     released_at: null,
-    tags: props.filters.tags,
+    tags: [],
     type: null,
 });
 
@@ -75,6 +66,31 @@ const releaseDates = [
         value: 0,
     },
 ];
+
+onMounted(async () => {
+    try {
+        const response = await apiClient.get('/discover');
+        const apiData = response.data;
+        if (apiData.songs) songs.value = apiData.songs;
+        if (apiData.adventures) adventures.value = apiData.adventures;
+        if (apiData.filters) {
+            genres.value = apiData.filters.genres ?? [];
+            tags.value = apiData.filters.tags ?? [];
+            vocals.value = apiData.filters.vocals ?? [];
+            filteredTags.value = apiData.filters.tags ?? [];
+        }
+        if (apiData.song_max_duration) {
+            song_max_duration.value = apiData.song_max_duration;
+            form.duration = [0, apiData.song_max_duration];
+        }
+        isLastSongPage.value = checkLastPage(ObjectTypes.Song);
+        isLastAdventurePage.value = checkLastPage(ObjectTypes.Adventure);
+    } catch (error) {
+        console.error('Failed to load page data:', error);
+    } finally {
+        loading.value = false;
+    }
+});
 
 const setFiltersDrawer = () => {
     showFilters.value = !showFilters.value;
@@ -104,112 +120,59 @@ const setFilterValues = (filtersData) => {
     }
 };
 
-const applyFilters = () => {
+const applyFilters = async () => {
     form.type = null;
-
-    apiClient.get(
-        route('discover.index'),
-        {
-            ...removeEmptyObjectsKeys(form.data()),
-        },
-        {
-            preserveState: true,
-            preserveUrl: true,
-            only: ['songs', 'adventures', 'pagination', 'filters'],
-            onSuccess: (page) => {
-                // Assuming you have a `songs` ref in your component
-                songs.value = authStore.songs;
-                adventures.value = authStore.adventures;
-                setFilterValues(form);
-
-                isLastSongPage.value = checkLastPage(ObjectTypes.Song);
-                isLastAdventurePage.value = checkLastPage(ObjectTypes.Adventure);
-                // showFilters.value = false; // Close the filters drawer after applying
-            },
-        },
-    );
-};
-
-const loadMore = (type) => {
-    if (type === ObjectTypes.Song) {
-        form.transform(() => removeEmptyObjectsKeys()).get(songs.value.links?.next, {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['songs', 'pagination'],
-            onSuccess: (page) => {
-                // Assuming you have a `songs` ref in your component
-                songs.value.data = [...songs.value.data, ...authStore.songs.data];
-
-                // Update the pagination metadata with the new data from the server
-                songs.value.links = authStore.songs.links;
-                songs.value.meta = authStore.songs.meta;
-
-                isLastSongPage.value = checkLastPage(ObjectTypes.Song);
-            },
+    try {
+        const response = await apiClient.get('/discover', {
+            params: removeEmptyObjectsKeys(form.data()),
         });
-    } else {
-        form.transform(() => removeEmptyObjectsKeys()).get(adventures.value.links?.next, {
-            preserveState: true,
-            preserveScroll: true,
-            only: ['adventures', 'pagination'],
-            onSuccess: (page) => {
-                // Assuming you have a `songs` ref in your component
-                adventures.value.data = [...adventures.value.data, ...authStore.adventures.data];
-
-                // Update the pagination metadata with the new data from the server
-                adventures.value.links = authStore.adventures.links;
-                adventures.value.meta = authStore.adventures.meta;
-
-                isLastAdventurePage.value = checkLastPage(ObjectTypes.Adventure);
-            },
-        });
+        const apiData = response.data;
+        if (apiData.songs) songs.value = apiData.songs;
+        if (apiData.adventures) adventures.value = apiData.adventures;
+        setFilterValues(form);
+        isLastSongPage.value = checkLastPage(ObjectTypes.Song);
+        isLastAdventurePage.value = checkLastPage(ObjectTypes.Adventure);
+    } catch (error) {
+        console.error('Failed to apply filters:', error);
     }
 };
-//
-// const addToFavorites = (uuid, type) => {
-//   apiClient.post(route('users.favorites.store', {
-//     user: user.uuid,
-//   }), {
-//     uuid: uuid,
-//     type: type,
-//   }, {
-//     preserveState: true,
-//     preserveScroll: true,
-//     only: ['songs', 'adventures', 'filters'],
-//   });
-// };
-//
-// const removeFromFavorites = (uuid, type) => {
-//   apiClient.delete(route('users.favorites.destroy', {
-//     user: user.uuid,
-//   }), {
-//     data: {
-//       uuid: uuid,
-//       type: type,
-//     },
-//     preserveState: true,
-//     preserveScroll: true,
-//     only: ['songs', 'adventures', 'filters'],
-//   });
-// };
+
+const loadMore = async (type) => {
+    const targetRef = type === ObjectTypes.Song ? songs : adventures;
+    const nextUrl = targetRef.value.links?.next;
+    if (!nextUrl) return;
+
+    try {
+        const response = await apiClient.get(nextUrl);
+        const apiData = response.data;
+        const newData = type === ObjectTypes.Song ? apiData.songs : apiData.adventures;
+        if (newData) {
+            targetRef.value.data = [...targetRef.value.data, ...(newData.data || [])];
+            targetRef.value.links = newData.links;
+            targetRef.value.meta = newData.meta;
+        }
+        if (type === ObjectTypes.Song) {
+            isLastSongPage.value = checkLastPage(ObjectTypes.Song);
+        } else {
+            isLastAdventurePage.value = checkLastPage(ObjectTypes.Adventure);
+        }
+    } catch (error) {
+        console.error('Failed to load more:', error);
+    }
+};
 
 const checkLastPage = (type) => {
     return ObjectTypes.getObjectType(type) === ObjectTypes.Adventure
         ? adventures.value.meta?.current_page === adventures.value.meta?.last_page
         : songs.value.meta?.current_page === songs.value.meta?.last_page;
 };
-
-onMounted(() => {
-    songs.value = authStore.songs;
-    adventures.value = authStore.adventures;
-
-    isLastSongPage.value = checkLastPage(ObjectTypes.Song);
-    isLastAdventurePage.value = checkLastPage(ObjectTypes.Adventure);
-});
 </script>
 
 <template>
-    <div class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100">
+    <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+        <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+    </div>
+    <div v-else class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100">
         <div class="container">
             <div class="row">
                 <div class="col text-start">
@@ -350,9 +313,9 @@ onMounted(() => {
                                         v-for="song in songs.data"
                                         :song="song"
                                         :can-view="isLogged"
-                                        :is-owned="song.user.uuid === user?.uuid"
-                                        @add-to-favorites="addToFavorites($event, user.uuid)"
-                                        @remove-from-favorites="removeFromFavorites($event, user.uuid)"
+                                        :is-owned="song.user?.uuid === user?.uuid"
+                                        @add-to-favorites="addToFavorites($event, user?.uuid)"
+                                        @remove-from-favorites="removeFromFavorites($event, user?.uuid)"
                                         @add-to-playlist="addToPlaylist($event)"
                                     />
                                     <DefaultButton
@@ -378,9 +341,9 @@ onMounted(() => {
                                         v-for="adventure in adventures.data"
                                         :adventure="adventure"
                                         :can-view="isLogged"
-                                        :is-owned="adventure.user.uuid === user?.uuid"
-                                        @add-to-favorites="addToFavorites($event, user.uuid)"
-                                        @remove-from-favorites="removeFromFavorites($event, user.uuid)"
+                                        :is-owned="adventure.user?.uuid === user?.uuid"
+                                        @add-to-favorites="addToFavorites($event, user?.uuid)"
+                                        @remove-from-favorites="removeFromFavorites($event, user?.uuid)"
                                     />
                                     <DefaultButton
                                         class-list="btn-outline mt-2 mx-auto"

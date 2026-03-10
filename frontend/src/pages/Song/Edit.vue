@@ -15,16 +15,23 @@ const Icon = defineAsyncComponent(() => import('@/Components/Icons/Icon.vue'));
 const ConfirmDeletionModal = defineAsyncComponent(() => import('@/Components/Modals/ConfirmDeletionModal.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    song: {
-        type: Object,
-        default: {},
-    },
-    user: {
-        type: Object,
-        default: {},
-    },
-});
+const song = ref(null);
+const user = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/songs/${currentRoute.params.uuid}/edit`);
+      const apiData = response.data;
+      song.value = apiData.song ?? null;
+    user.value = apiData.user ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const authStore = useAuthStore();
 
@@ -36,26 +43,26 @@ const maxAllowed = 60;
 const titleLength = ref(0);
 const inputAllowed = ref(true);
 
-const artworkPreview = ref(props.song.artwork);
+const artworkPreview = ref(song.value?.artwork);
 
 const form = useForm({
     _method: 'PATCH',
-    title: props.song.title,
-    tags: props.song.tags,
-    vocal_id: props.song.vocal_id,
-    genres: props.song.genres,
-    is_visible: props.song.is_visible,
-    allow_comments: props.song.allow_comments,
-    allow_download: props.song.allow_download,
-    is_explicit: props.song.is_explicit,
-    is_patron: props.song.is_patron,
-    description: props.song.description,
-    script: props.song.script,
+    title: song.value?.title,
+    tags: song.value?.tags,
+    vocal_id: song.value?.vocal_id,
+    genres: song.value?.genres,
+    is_visible: song.value?.is_visible,
+    allow_comments: song.value?.allow_comments,
+    allow_download: song.value?.allow_download,
+    is_explicit: song.value?.is_explicit,
+    is_patron: song.value?.is_patron,
+    description: song.value?.description,
+    script: song.value?.script,
     artwork: null,
 });
 
 const setImagePreview = () => {
-    artworkPreview.value = form.artwork ? URL.createObjectURL(form.artwork) : props.song.artwork;
+    artworkPreview.value = form.artwork ? URL.createObjectURL(form.artwork) : song.value?.artwork;
 };
 
 const addTag = (tag) => {
@@ -69,7 +76,7 @@ const addTag = (tag) => {
 };
 
 const submit = () => {
-    form.transform(removeEmptyObjectsKeys).post(route('songs.update', props.song), {
+    form.transform(removeEmptyObjectsKeys).post(route('songs.update', song.value), {
         preserveScroll: true,
     });
 };
@@ -77,14 +84,14 @@ const submit = () => {
 const { open, close } = useModal({
     component: ConfirmDeletionModal,
     attrs: {
-        title: props.song.title,
+        title: song.value?.title,
         type: ObjectTypes.Song,
         onClose() {
             close();
         },
         onConfirm() {
             close();
-            apiClient.delete(route('songs.destroy', props.song));
+            apiClient.delete(route('songs.destroy', song.value));
         },
     },
     clickToClose: true,
@@ -100,11 +107,15 @@ watch(
 );
 
 onMounted(() => {
-    titleLength.value = props.song.title.length;
+    titleLength.value = song.title.length;
 });
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :user="user">
         <div class="row gy-3">
@@ -237,3 +248,4 @@ onMounted(() => {
         </div>
     </UserLayout>
 </template>
+  </template>

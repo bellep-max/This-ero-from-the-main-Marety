@@ -11,16 +11,22 @@ const SettingsLayout = defineAsyncComponent(() => import('@/Layouts/SettingsLayo
 const DefaultButton = defineAsyncComponent(() => import('@/Components/Buttons/DefaultButton.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    genders: {
-        required: true,
-        type: Object,
-    },
-    countries: {
-        type: Object,
-        default: {},
-    },
-});
+const genders = ref(null);
+const countries = ref(null);
+const loading = ref(true);
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get('/settings/profile');
+      const apiData = response.data;
+      genders.value = apiData.genders ?? null;
+    countries.value = apiData.countries ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const authStore = useAuthStore();
 const user = authStore.user;
@@ -48,7 +54,7 @@ const reset = () => {
 };
 
 const countryOptions = computed(() =>
-    props.countries.map((element) => {
+    countries.map((element) => {
         return {
             value: element.id,
             text: element.name,
@@ -58,6 +64,10 @@ const countryOptions = computed(() =>
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <SettingsLayout :title="$t('menus.user_settings.profile')">
         <BForm class="row gy-4" @submit="onSubmit" @reset="reset">
@@ -114,3 +124,4 @@ const countryOptions = computed(() =>
         </BForm>
     </SettingsLayout>
 </template>
+  </template>

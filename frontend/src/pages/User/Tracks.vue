@@ -14,36 +14,40 @@ const UserLayout = defineAsyncComponent(() => import('@/Layouts/UserLayout.vue')
 const Song = defineAsyncComponent(() => import('@/Components/Song.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    user: {
-        required: true,
-        type: Object,
-    },
-    tracks: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-    filters: {
-        type: Object,
-        required: true,
-    },
-});
+const user = ref(null);
+const tracks = ref(null);
+const initialFilters = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/users/${currentRoute.params.username}/tracks`);
+      const apiData = response.data;
+      user.value = apiData.user ?? null;
+    tracks.value = apiData.tracks ?? null;
+    initialFilters.value = apiData.filters ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const authStore = useAuthStore();
 
 const clearable = ref(false);
 
 const pageTitle = computed(() =>
-    props.user.own_profile ? $t('pages.user.my_tracks') : $t('pages.user.user_tracks', { name: props.user.name }),
+    user.value?.own_profile ? $t('pages.user.my_tracks') : $t('pages.user.user_tracks', { name: user.value?.name }),
 );
 
 const filters = useForm({
-    search: props.filters?.search,
+    search: initialFilters.value?.search,
 });
 
 const applyFilters = () => {
-    filters.transform(removeEmptyObjectsKeys).get(route('users.tracks', props.user), {
+    filters.transform(removeEmptyObjectsKeys).get(route('users.tracks', user), {
         preserveScroll: true,
         preserveState: true,
         only: ['tracks'],
@@ -66,6 +70,10 @@ watch(
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :title="pageTitle" :user="user" :overflow="false">
         <div class="d-flex flex-column gap-4">
@@ -100,3 +108,4 @@ watch(
         </div>
     </UserLayout>
 </template>
+  </template>

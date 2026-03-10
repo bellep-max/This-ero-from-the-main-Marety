@@ -26,41 +26,47 @@ import route from "@/helpers/route"
 const audioPlayer = useAudioPlayerStore();
 const { isPlaying, currentTrack } = storeToRefs(audioPlayer);
 
-const props = defineProps({
-    track: {
-        type: Object,
-        default: {},
-    },
-    user: {
-        type: Object,
-        default: {},
-    },
-    comments: {
-        type: Array,
-    },
-});
+const track = ref(null);
+const user = ref(null);
+const comments = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/songs/${currentRoute.params.uuid}`);
+      const apiData = response.data;
+      track.value = apiData.track ?? null;
+    user.value = apiData.user ?? null;
+    comments.value = apiData.comments ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const loggedUser = useAuthStore().user;
 const vfm = useVfm();
 
-const isOwned = computed(() => loggedUser && loggedUser.uuid === props.user.uuid);
+const isOwned = computed(() => loggedUser && loggedUser.uuid === user.value?.uuid);
 const canDownload = computed(
-    () => props.user.own_profile || loggedUser.group_settings?.option_download_hd || props.track.allow_download,
+    () => user.value?.own_profile || loggedUser.group_settings?.option_download_hd || track.value?.allow_download,
 );
-const isCurrentTrack = computed(() => currentTrack.value?.uuid === props.track.uuid);
-const type = computed(() => ObjectTypes.getObjectType(props.track.type));
+const isCurrentTrack = computed(() => currentTrack.value?.uuid === track.value?.uuid);
+const type = computed(() => ObjectTypes.getObjectType(track.value?.type));
 
 const openDeleteModal = () =>
     useModal({
         component: ConfirmDeletionModal,
         attrs: {
-            title: props.track.title,
+            title: track.value?.title,
             type: type.value,
             onClose() {
                 vfm.close('delete-track-modal');
             },
             onConfirm() {
-                apiClient.delete(route('tracks.destroy', props.track));
+                apiClient.delete(route('tracks.destroy', track.value));
                 vfm.close('delete-track-modal');
             },
         },
@@ -72,8 +78,8 @@ const openShareModal = () =>
     useModal({
         component: ShareModal,
         attrs: {
-            title: props.track.title,
-            item: props.track,
+            title: track.value?.title,
+            item: track.value,
             onClose() {
                 vfm.close('share-modal');
             },
@@ -89,8 +95,8 @@ const openDownloadModal = () =>
     useModal({
         component: DownloadModal,
         attrs: {
-            title: props.track.title,
-            item: props.track,
+            title: track.value?.title,
+            item: track.value,
             type: type.value,
             onClose() {
                 vfm.close('download-modal');
@@ -107,7 +113,7 @@ const openReportModal = () =>
     useModal({
         component: ReportModal,
         attrs: {
-            item: props.track,
+            item: track.value,
             type: type.value,
             onClose() {
                 vfm.close('report-modal');
@@ -120,10 +126,14 @@ const openReportModal = () =>
         escToClose: true,
     }).open();
 
-const updateComments = () => {
-    router.reload({
-        only: ['comments'],
-    });
+const updateComments = async () => {
+  try {
+    const response = await apiClient.get(currentRoute.path.replace(/^\//, ''));
+    const apiData = response.data;
+    if (apiData.comments) comments.value = apiData.comments;
+  } catch (error) {
+    console.error('Failed to refresh comments:', error);
+  }
 };
 
 const openSubscriptionModal = () =>
@@ -142,7 +152,7 @@ const openSubscriptionModal = () =>
     }).open();
 
 const handlePlayClick = () => {
-    if (props.track.is_patron) {
+    if (track.value?.is_patron) {
         openSubscriptionModal();
         return;
     }
@@ -151,7 +161,7 @@ const handlePlayClick = () => {
         if (isCurrentTrack.value) {
             audioPlayer.togglePlayPause();
         } else {
-            audioPlayer.setTracks(props.track);
+            audioPlayer.setTracks(track.value);
         }
     } catch (error) {
         console.error('Failed to play track:', error);
@@ -160,6 +170,10 @@ const handlePlayClick = () => {
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :user="user" :slides="track.slides">
         <div class="row gy-3">
@@ -254,3 +268,4 @@ const handlePlayClick = () => {
         </template>
     </UserLayout>
 </template>
+  </template>

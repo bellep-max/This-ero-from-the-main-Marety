@@ -14,44 +14,51 @@ const Icon = defineAsyncComponent(() => import('@/Components/Icons/Icon.vue'));
 const ConfirmDeletionModal = defineAsyncComponent(() => import('@/Components/Modals/ConfirmDeletionModal.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    episode: {
-        type: Object,
-        default: {},
-    },
-    user: {
-        type: Object,
-        default: {},
-    },
-});
+const episode = ref(null);
+const user = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/episodes/${currentRoute.params.episodeUuid}/edit`);
+      const apiData = response.data;
+      episode.value = apiData.episode ?? null;
+    user.value = apiData.user ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const allowedFileSize = 92970;
 const maxAllowed = 60;
 const titleLength = ref(0);
 const inputAllowed = ref(true);
 
-const artworkPreview = ref(props.episode.artwork);
+const artworkPreview = ref(episode.value?.artwork);
 
 const validateFileSize = ref(false);
 
 const form = useForm({
     _method: 'PATCH',
-    title: props.episode.title,
-    is_visible: props.episode.is_visible,
-    allow_comments: props.episode.allow_comments,
-    allow_download: props.episode.allow_download,
-    explicit: props.episode.explicit,
-    description: props.episode.description,
+    title: episode.value?.title,
+    is_visible: episode.value?.is_visible,
+    allow_comments: episode.value?.allow_comments,
+    allow_download: episode.value?.allow_download,
+    explicit: episode.value?.explicit,
+    description: episode.value?.description,
     artwork: null,
     file: null,
 });
 
 const setImagePreview = () => {
-    artworkPreview.value = form.artwork ? URL.createObjectURL(form.artwork) : props.episode.artwork;
+    artworkPreview.value = form.artwork ? URL.createObjectURL(form.artwork) : episode.value?.artwork;
 };
 
 const submit = () => {
-    form.transform(removeEmptyObjectsKeys).post(route('episodes.update', props.episode), {
+    form.transform(removeEmptyObjectsKeys).post(route('episodes.update', episode.value), {
         preserveScroll: true,
     });
 };
@@ -59,14 +66,14 @@ const submit = () => {
 const { open, close } = useModal({
     component: ConfirmDeletionModal,
     attrs: {
-        title: props.episode.title,
+        title: episode.value?.title,
         type: ObjectTypes.PodcastEpisode,
         onClose() {
             close();
         },
         onConfirm() {
             close();
-            apiClient.delete(route('episodes.destroy', props.episode));
+            apiClient.delete(route('episodes.destroy', episode.value));
         },
     },
     clickToClose: true,
@@ -90,11 +97,15 @@ watch(
 );
 
 onMounted(() => {
-    titleLength.value = props.episode.title.length;
+    titleLength.value = episode.title.length;
 });
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :user="user">
         <div class="row gy-3">
@@ -187,3 +198,4 @@ onMounted(() => {
         </div>
     </UserLayout>
 </template>
+  </template>

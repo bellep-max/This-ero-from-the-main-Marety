@@ -24,30 +24,37 @@ import route from "@/helpers/route"
 const audioPlayer = useAudioPlayerStore();
 const { isPlaying, currentTrack } = storeToRefs(audioPlayer);
 
-const props = defineProps({
-    adventure: {
-        type: Object,
-        default: {},
-    },
-    user: {
-        type: Object,
-        default: {},
-    },
-    comments: {
-        type: Array,
-    },
-});
+const adventure = ref(null);
+const user = ref(null);
+const comments = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/adventures/${currentRoute.params.uuid}`);
+      const apiData = response.data;
+      adventure.value = apiData.adventure ?? null;
+    user.value = apiData.user ?? null;
+    comments.value = apiData.comments ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const loggedUser = useAuthStore().user;
 const vfm = useVfm();
 
-const hasDescription = computed(() => props.adventure.description?.length > 0);
-const isOwned = computed(() => loggedUser && loggedUser.uuid === props.user.uuid);
-const isCurrentTrack = computed(() => currentTrack.value?.uuid === props.adventure.uuid);
+const hasDescription = computed(() => adventure.value?.description?.length > 0);
+const isOwned = computed(() => loggedUser && loggedUser.uuid === user.value?.uuid);
+const isCurrentTrack = computed(() => currentTrack.value?.uuid === adventure.value?.uuid);
 const totalTracks = computed(() => {
-    let total = props.adventure.children.length;
+    if (!adventure.value?.children) return 0;
+    let total = adventure.value.children.length;
 
-    for (const root of props.adventure.children) {
+    for (const root of adventure.value.children) {
         if (isNotEmpty(root.children)) {
             total += root.children.length;
         }
@@ -62,7 +69,7 @@ const addToFavorites = () => {
             user: loggedUser.uuid,
         }),
         {
-            uuid: props.adventure.uuid,
+            uuid: adventure.value?.uuid,
             type: ObjectTypes.Adventure,
         },
         {
@@ -76,13 +83,13 @@ const openDeleteModal = () =>
     useModal({
         component: ConfirmDeletionModal,
         attrs: {
-            title: props.adventure.title,
+            title: adventure.value?.title,
             type: ObjectTypes.Adventure,
             onClose() {
                 vfm.close('delete-modal');
             },
             onConfirm() {
-                apiClient.delete(route('adventures.destroy', props.adventure));
+                apiClient.delete(route('adventures.destroy', adventure.value));
                 vfm.close('delete-modal');
             },
         },
@@ -94,8 +101,8 @@ const openShareModal = () =>
     useModal({
         component: ShareModal,
         attrs: {
-            title: props.adventure.title,
-            item: props.adventure,
+            title: adventure.value?.title,
+            item: adventure.value,
             onClose() {
                 vfm.close('share-modal');
             },
@@ -111,7 +118,7 @@ const openReportModal = () =>
     useModal({
         component: ReportModal,
         attrs: {
-            item: props.adventure,
+            item: adventure.value,
             type: ObjectTypes.Adventure,
             onClose() {
                 vfm.close('report-modal');
@@ -128,7 +135,7 @@ const openMapModal = () =>
     useModal({
         component: AdventureMapModal,
         attrs: {
-            adventure: props.adventure,
+            adventure: adventure.value,
             onClose() {
                 vfm.close('adventure-map-modal');
             },
@@ -140,10 +147,14 @@ const openMapModal = () =>
         escToClose: true,
     }).open();
 
-const updateComments = () => {
-    router.reload({
-        only: ['comments'],
-    });
+const updateComments = async () => {
+  try {
+    const response = await apiClient.get(currentRoute.path.replace(/^\//, ''));
+    const apiData = response.data;
+    if (apiData.comments) comments.value = apiData.comments;
+  } catch (error) {
+    console.error('Failed to refresh comments:', error);
+  }
 };
 
 const handlePlayClick = () => {
@@ -151,7 +162,7 @@ const handlePlayClick = () => {
         if (isCurrentTrack.value) {
             audioPlayer.togglePlayPause();
         } else {
-            audioPlayer.setTracks(props.adventure);
+            audioPlayer.setTracks(adventure.value);
         }
     } catch (error) {
         console.error('Failed to play track:', error);
@@ -160,6 +171,10 @@ const handlePlayClick = () => {
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :user="user">
         <div class="row gy-3">
@@ -246,3 +261,4 @@ const handlePlayClick = () => {
         </template>
     </UserLayout>
 </template>
+  </template>

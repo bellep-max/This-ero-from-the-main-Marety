@@ -11,28 +11,38 @@ const CircledText = defineAsyncComponent(() => import('@/Components/CircledText.
 const Song = defineAsyncComponent(() => import('@/Components/Song.vue'));
 const ProfileBlockHeader = defineAsyncComponent(() => import('@/Components/ProfileBlockHeader.vue'));
 
-const props = defineProps({
-    user: {
-        required: true,
-        type: Object,
-    },
-    recent: {
-        required: false,
-        type: Object,
-        default: {},
-    },
-});
+const user = ref(null);
+const recent = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/users/${currentRoute.params.username}`);
+      const apiData = response.data;
+      user.value = apiData.user ?? null;
+    recent.value = apiData.recent ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const authStore = useAuthStore();
 
 const pageTitle = computed(() =>
-    props.user.own_profile
+    user.value?.own_profile
         ? $t('pages.user.my_profile_overview')
-        : $t('pages.user.user_profile_overview', { name: props.user.name }),
+        : $t('pages.user.user_profile_overview', { name: user.value?.name }),
 );
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :title="pageTitle" :user="user" :overflow="false">
         <div class="d-flex flex-row gap-4 justify-content-xl-start justify-content-center align-items-center flex-wrap">
@@ -58,3 +68,4 @@ const pageTitle = computed(() =>
         </div>
     </UserLayout>
 </template>
+  </template>

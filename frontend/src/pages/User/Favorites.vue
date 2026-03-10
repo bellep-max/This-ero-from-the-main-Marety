@@ -14,47 +14,42 @@ const PlaylistCard = defineAsyncComponent(() => import('@/Components/Cards/Playl
 const FollowerCard = defineAsyncComponent(() => import('@/Components/Cards/FollowerCard.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    user: {
-        required: true,
-        type: Object,
-    },
-    adventures: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-    podcasts: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-    episodes: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-    songs: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-    playlists: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-    users: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-});
+const user = ref(null);
+const adventures = ref(null);
+const podcasts = ref(null);
+const episodes = ref(null);
+const songs = ref(null);
+const playlists = ref(null);
+const users = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/users/${currentRoute.params.username}/favorites`);
+      const apiData = response.data;
+      user.value = apiData.user ?? null;
+    adventures.value = apiData.adventures ?? null;
+    podcasts.value = apiData.podcasts ?? null;
+    episodes.value = apiData.episodes ?? null;
+    songs.value = apiData.songs ?? null;
+    playlists.value = apiData.playlists ?? null;
+    users.value = apiData.users ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const authStore = useAuthStore();
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :title="$t('pages.user.my_favorites.title')" :user="user" :overflow="false">
         <BTabs
@@ -146,3 +141,4 @@ const authStore = useAuthStore();
         </BTabs>
     </UserLayout>
 </template>
+  </template>

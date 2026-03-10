@@ -10,24 +10,34 @@ const DefaultButton = defineAsyncComponent(() => import('@/Components/Buttons/De
 const PlaylistCard = defineAsyncComponent(() => import('@/Components/Cards/PlaylistCard.vue'));
 const CreatePlaylistModal = defineAsyncComponent(() => import('@/Components/Modals/CreatePlaylistModal.vue'));
 
-const props = defineProps({
-    user: {
-        required: true,
-        type: Object,
-    },
-    playlists: {
-        required: true,
-        type: Object,
-        default: {},
-    },
-});
+const user = ref(null);
+const playlists = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/users/${currentRoute.params.username}/playlists`);
+      const apiData = response.data;
+      user.value = apiData.user ?? null;
+    playlists.value = apiData.playlists ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const pageTitle = computed(() =>
-    props.user.own_profile ? $t('pages.user.my_playlists') : $t('pages.user.user_playlists', { name: props.user.name }),
+    user.value?.own_profile ? $t('pages.user.my_playlists') : $t('pages.user.user_playlists', { name: user.value?.name }),
 );
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :title="pageTitle" :user="user">
         <template v-if="user.own_profile" #controls>
@@ -43,3 +53,4 @@ const pageTitle = computed(() =>
         </div>
     </UserLayout>
 </template>
+  </template>

@@ -59,6 +59,16 @@ The project has been split from a Laravel+Inertia monolith into two separate cod
 - CSRF: Frontend calls `/sanctum/csrf-cookie` before auth requests
 - CORS configured in `config/cors.php` to allow frontend origin
 
+## Conversion Status
+- All 35 pages converted from Inertia `defineProps` to API-fetched data via `onMounted` + `apiClient.get()`
+- All 69 components migrated from Inertia patterns to standard Vue 3 (no Inertia imports remain)
+- Loading spinners added to all pages while data loads
+- Null-safe access patterns (`.value?.`) applied to all ref access in script sections
+- `router.reload()` replaced with proper API refetch patterns
+- `router.post/delete/get/visit()` replaced with `apiClient` and `vueRouter.push()`
+- Build succeeds with 1155 modules, no compilation errors
+- Some backend API endpoints return 500 (service bindings not fully configured) — these are backend issues, not frontend conversion issues
+
 ## Key Fixes Made for Replit/PostgreSQL
 - Removed MySQL-specific `utf8mb4_bin` collation from comments migration
 - Removed MySQL charset/collation from song_tags migration

@@ -14,16 +14,25 @@ const Multiselect = defineAsyncComponent(() => import('@vueform/multiselect'));
 import '@vueform/multiselect/themes/default.css';
 import route from "@/helpers/route"
 
-const props = defineProps({
-    playlist: {
-        type: Object,
-        default: {},
-    },
-});
+const playlist = ref(null);
+const loading = ref(true);
+const currentRoute = useRoute();
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get(`/playlists/${currentRoute.params.uuid}/edit`);
+      const apiData = response.data;
+      playlist.value = apiData.playlist ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const defaultArtworkLink = '/assets/images/playlist.png';
 
-const artworkPreview = ref(props.playlist.artwork);
+const artworkPreview = ref(playlist.value?.artwork);
 const artworkSelected = ref(false);
 
 const authStore = useAuthStore();
@@ -33,12 +42,12 @@ const genres = ref(authStore.filter_presets.genres);
 const form = useForm({
     _method: 'patch',
     artwork: null,
-    genres: props.playlist.genres,
-    title: props.playlist.title,
-    description: props.playlist.description,
-    is_visible: props.playlist.is_visible,
-    allow_comments: props.playlist.allow_comments,
-    is_explicit: props.playlist.is_explicit,
+    genres: playlist.value?.genres,
+    title: playlist.value?.title,
+    description: playlist.value?.description,
+    is_visible: playlist.value?.is_visible,
+    allow_comments: playlist.value?.allow_comments,
+    is_explicit: playlist.value?.is_explicit,
 });
 
 const resetArtwork = () => {
@@ -55,7 +64,7 @@ const setImagePreview = (image) => {
 };
 
 const submit = () => {
-    form.transform(removeEmptyObjectsKeys).post(route('playlists.update', props.playlist), {
+    form.transform(removeEmptyObjectsKeys).post(route('playlists.update', playlist.value), {
         preserveState: true,
         preserveScroll: true,
         onSuccess: () => {
@@ -78,6 +87,10 @@ watch(
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <UserLayout :user="playlist.user">
         <div class="d-flex flex-column gap-3">
@@ -158,5 +171,6 @@ watch(
         </div>
     </UserLayout>
 </template>
+  </template>
 
 <style scoped></style>

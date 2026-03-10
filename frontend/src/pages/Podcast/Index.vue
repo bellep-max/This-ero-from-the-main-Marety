@@ -14,16 +14,22 @@ const Multiselect = defineAsyncComponent(() => import('@vueform/multiselect'));
 import '@vueform/multiselect/themes/default.css';
 import route from "@/helpers/route"
 
-const props = defineProps({
-    regions: {
-        type: Array,
-        default: [],
-    },
-    filters: {
-        type: Object,
-        required: true,
-    },
-});
+const regions = ref(null);
+const initialFilters = ref(null);
+const loading = ref(true);
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get('/podcasts');
+      const apiData = response.data;
+      regions.value = apiData.regions ?? null;
+    initialFilters.value = apiData.filters ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const authStore = useAuthStore();
 
@@ -103,7 +109,7 @@ const loadMore = () => {
         onSuccess: (page) => {
             podcasts.value.data = [...podcasts.value.data, ...authStore.podcasts.data];
 
-            // Update the pagination metadata with the new data from the server
+            // Update the pagination.value metadata with the new data from the server
             podcasts.value.links = authStore.podcasts.links;
             podcasts.value.meta = authStore.podcasts.meta;
 
@@ -122,6 +128,10 @@ onMounted(() => {
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     <div class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100">
         <div class="container">
             <div class="row">
@@ -256,3 +266,4 @@ onMounted(() => {
         </div>
     </div>
 </template>
+  </template>

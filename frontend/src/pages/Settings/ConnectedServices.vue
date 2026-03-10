@@ -11,12 +11,20 @@ const SettingsLayout = defineAsyncComponent(() => import('@/Layouts/SettingsLayo
 const DefaultButton = defineAsyncComponent(() => import('@/Components/Buttons/DefaultButton.vue'));
 import route from "@/helpers/route"
 
-const props = defineProps({
-    connections: {
-        type: Array,
-        default: [],
-    },
-});
+const connections = ref(null);
+const loading = ref(true);
+
+  onMounted(async () => {
+    try {
+      const response = await apiClient.get('/settings/connected-services');
+      const apiData = response.data;
+      connections.value = apiData.connections ?? null;
+    } catch (error) {
+      console.error('Failed to load page data:', error);
+    } finally {
+      loading.value = false;
+    }
+  });
 
 const authStore = useAuthStore();
 const user = authStore.user;
@@ -38,6 +46,10 @@ const submit = () => {
 </script>
 
 <template>
+      <div v-if="loading" class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100 d-flex justify-content-center align-items-center">
+          <div class="spinner-border text-light" role="status"><span class="visually-hidden">Loading...</span></div>
+      </div>
+      <template v-else>
     
     <SettingsLayout :title="$t('menus.user_settings.connect')">
         <div class="d-flex flex-column justify-content-center align-items-center gap-4">
@@ -60,3 +72,4 @@ const submit = () => {
         </div>
     </SettingsLayout>
 </template>
+  </template>

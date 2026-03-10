@@ -1,4 +1,4 @@
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import apiClient from '@/api/client'
 import { useRouter } from 'vue-router'
 
@@ -16,6 +16,7 @@ export function useForm<T extends Record<string, any>>(initialData: T) {
   const errors = reactive<Record<string, string>>({})
   const recentlySuccessful = ref(false)
   const wasSuccessful = ref(false)
+  const isDirty = ref(false)
   let defaults = { ...initialData }
 
   const form = reactive({
@@ -24,6 +25,7 @@ export function useForm<T extends Record<string, any>>(initialData: T) {
     errors,
     recentlySuccessful,
     wasSuccessful,
+    isDirty,
 
     data() {
       const data: Record<string, any> = {}
@@ -35,10 +37,6 @@ export function useForm<T extends Record<string, any>>(initialData: T) {
 
     transform(callback: (data: T) => any) {
       const self = { ...form }
-      const originalPost = form.post.bind(form)
-      const originalPut = form.put.bind(form)
-      const originalPatch = form.patch.bind(form)
-      const originalDelete = form.delete.bind(form)
 
       return {
         ...self,
@@ -54,6 +52,9 @@ export function useForm<T extends Record<string, any>>(initialData: T) {
         delete(url: string, options?: FormOptions) {
           return sendRequest('delete', url, callback(form.data()), options)
         },
+        get(url: string, options?: FormOptions) {
+          return sendRequest('get', url, undefined, options, callback(form.data()))
+        },
       }
     },
 
@@ -68,6 +69,7 @@ export function useForm<T extends Record<string, any>>(initialData: T) {
         }
       }
       form.clearErrors()
+      isDirty.value = false
     },
 
     clearErrors(...fields: string[]) {
@@ -105,11 +107,25 @@ export function useForm<T extends Record<string, any>>(initialData: T) {
     },
 
     async get(url: string, options?: FormOptions) {
-      return sendRequest('get', url, undefined, options)
+      return sendRequest('get', url, undefined, options, form.data())
     },
   })
 
-  async function sendRequest(method: string, url: string, data?: any, options?: FormOptions) {
+  watch(
+    () => {
+      const data: Record<string, any> = {}
+      for (const key of Object.keys(defaults)) {
+        data[key] = (form as any)[key]
+      }
+      return JSON.stringify(data)
+    },
+    () => {
+      const current = form.data()
+      isDirty.value = JSON.stringify(current) !== JSON.stringify(defaults)
+    }
+  )
+
+  async function sendRequest(method: string, url: string, data?: any, options?: FormOptions, queryParams?: any) {
     processing.value = true
     Object.keys(errors).forEach(key => delete errors[key])
 
@@ -118,6 +134,10 @@ export function useForm<T extends Record<string, any>>(initialData: T) {
       const config: any = {}
       if (isFormData) {
         config.headers = { 'Content-Type': 'multipart/form-data' }
+      }
+
+      if (queryParams && method === 'get') {
+        config.params = queryParams
       }
 
       let response: any

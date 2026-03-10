@@ -1,1 +1,0 @@
-import{E as t,F as n,D as c}from"./@vue-DqVXLkkv.js";const a={class:"container"},o=["innerHTML"],_={__name:"StaticPage",props:{content:{type:Object,required:!0,default:{}}},setup(e){return(r,s)=>(c(),t("div",a,[n("span",{innerHTML:e.content.content},null,8,o)]))}};export{_ as default};
