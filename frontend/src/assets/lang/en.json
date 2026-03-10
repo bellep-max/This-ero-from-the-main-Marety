@@ -1,0 +1,598 @@
+{
+    "menus": {
+        "header": {
+            "discover": "Discover",
+            "genres": "Genres",
+            "blog": "Blog",
+            "trending": "Trending",
+            "podcasts": "Podcasts"
+        },
+        "settings": {
+            "settings": "Settings",
+            "feedback": "Feedback",
+            "invite": "Invite Friends"
+        },
+        "user_settings": {
+            "profile": "Profile",
+            "subscription": "Subscription",
+            "account": "Account",
+            "password": "Password",
+            "preferences": "Preferences",
+            "connect": "Connected Accounts"
+        },
+        "user_menu": {
+            "admin_panel": "Admin Panel",
+            "overview": "Overview",
+            "favorites": "My favorites",
+            "notifications": "Notifications",
+            "adventures": "Adventures",
+            "podcasts": "Podcasts",
+            "followers": "Followers",
+            "following": "Following",
+            "tracks": "Tracks",
+            "playlists": "Playlists",
+            "purchased": "Purchased",
+            "sign_out": "Sign Out"
+        },
+        "track": {
+            "add_to_favorites": "Add to Favorites",
+            "remove_from_favorites": "Remove from Favorites",
+            "add_playlist": "Add to Playlist",
+            "share": "Share",
+            "report": "Report",
+            "add_to_queue": {
+                "title": "Add to Queue",
+                "play_next": "Play next",
+                "play_last": "Play last"
+            }
+        }
+    },
+    "pages": {
+        "home": {
+            "new_audios": {
+                "title": "New Audios",
+                "description": "New Erotic Audios",
+                "categories": {
+                    "fresh_audios": "Fresh Audios",
+                    "female_voice": "Female Voice",
+                    "male_voice": "Male Voice"
+                }
+            },
+            "genres": {
+                "title": "Genres",
+                "description": "Story by genre"
+            },
+            "popular_audios": {
+                "title": "Popular Audios",
+                "description": "25 audios from the previous 7 day period",
+                "categories": {
+                    "daily": "Top Played Daily",
+                    "weekly": "Top Played Weekly",
+                    "monthly": "Top Played Monthly"
+                }
+            },
+            "adventures": {
+                "title": "Adventures",
+                "description": "Choose your own adventure stories"
+            },
+            "new_posts": {
+                "title": "New Posts"
+            },
+            "testimonials": {
+                "title": "Testimonials",
+                "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit"
+            }
+        },
+        "discover": {
+            "title": "Discover",
+            "description": "Discover new tracks",
+            "filters": {
+                "genre": "Genre",
+                "voice": "Voice",
+                "tags": {
+                    "name": "Tags",
+                    "placeholder": "Find a tag..."
+                },
+                "duration": "Duration (minutes)",
+                "release_date": {
+                    "name": "Release date",
+                    "options": {
+                        "recent": "Recent",
+                        "older": "Older"
+                    }
+                }
+            },
+            "tabs": {
+                "songs": "Songs ({count})",
+                "adventures": "Adventures ({count})"
+            }
+        },
+        "blog": {
+            "title": "Blog",
+            "description": "Discover new tracks",
+            "filters": {
+                "categories": "Categories",
+                "archives": "Archives",
+                "tags": {
+                    "name": "Tags",
+                    "placeholder": "Find a tag..."
+                }
+            }
+        },
+        "genres": {
+            "title": "Genres",
+            "description": "Story by genre",
+            "see_all": "See all genres"
+        },
+        "trending": {
+            "title": "Popular Audios",
+            "description": "Story by genre",
+            "top_20": {
+                "title": "Top 20 categories",
+                "description": "Top 20 in different categories"
+            },
+            "top_genre": {
+                "title": "Top by Genre"
+            },
+            "popular_audios": {
+                "title": "Popular Audios",
+                "description": "25 audios from the previous 7 day period",
+                "categories": {}
+            }
+        },
+        "podcasts": {
+            "title": "Podcasts",
+            "description": "Stream the best podcasts from your favorite stations",
+            "see_all": "See all podcasts",
+            "see_all_seasons": "See all seasons",
+            "season": "Season {season}",
+            "seasons": "Seasons",
+            "episodes": "Episodes",
+            "filters": {
+                "categories": "Categories",
+                "languages": "Languages",
+                "countries": "Countries",
+                "regions": "Regions"
+            },
+            "tabs": {
+                "overview": "Overview",
+                "subscribers": "Subscribers ({count})",
+                "related": "Related Podcasts"
+            },
+            "no_related": "No related podcasts found"
+        },
+        "upload": {
+            "title": "Upload Audio",
+            "recommended_format": "Recommended format: MP3 {'@'}128kbs or better",
+            "max_size": "Max size: 92.97MB",
+            "time_allowed": "Time allowed: 01:40:00",
+            "formats_allowed": "File formats allowed: MP3, M4A, WAV, AIFF, FLAC, AAC, OGG, MP2, MP4 and WMA",
+            "limit_exceeded": "You can only upload up to 3 tracks per week.",
+            "upgrade_account": "Upgrade your account to have unlimited number of uploads per week/day"
+        },
+        "settings": {
+            "profile_image_title": "My Profile Picture",
+            "profile_image_description": "Maximum size of 3MB. JPG, GIF, PNG.",
+            "profile_display_name_title": "Display Name",
+            "profile_display_name_description": "This will be displayed on your profile, so be sure to use a name people will be able to recognize and search for.",
+            "profile_country_title": "Country",
+            "profile_country_description": "Represent your region and discover music, friends, and events in your area.",
+            "profile_bio_title": "Short Bio",
+            "profile_bio_description": "Allow other users to learn a little bit more about the person behind the Playlist.",
+            "profile_birth_title": "Date of Birth",
+            "profile_birth_description": "This is not displayed on your profile.",
+            "profile_gender_title": "I identify as",
+            "profile_gender_description": "Allow other users to learn a little bit more about the person behind the Playlist.",
+            "subscription_title": "Upgrade your account and enjoy exclusive premium features.",
+            "subscription_feature_1": "An access to having other people make a paid subscription to User's account",
+            "subscription_feature_2": "Hide uploaded content behind a paywall for other Users",
+            "subscription_feature_3": "Unlimited number of uploads per week/day",
+            "subscription_feature_4": "Upload Audios of over 35 min length",
+            "subscription_feature_5": "Link podcasts/audios to Spotify",
+            "password_description": "Your password should be at least {count} characters and not a dictionary word or common name. You should change your password once a year.",
+            "current_password": "Current Password",
+            "new_password": "New Password",
+            "retype_new_password": "Retype New Password",
+            "account": {
+                "address_username": {
+                    "title": "Profile Address & Username",
+                    "description": "Your custom URL can also be used as your login username. You can edit this URL once per day."
+                },
+                "email": {
+                    "title": "Email",
+                    "description": "Keep your email address up to date to guarantee that you are notified of your account activity and latest features. Change your e-mail preferences in ",
+                    "notifications": "Notifications"
+                },
+                "current_password": {
+                    "title": "Current Password",
+                    "description": "Your current password is required to make the above changes."
+                }
+            },
+            "preferences": {
+                "restore_songs": "When I come, automatically restore my last songs.",
+                "fade_on_play_pause": "When I Play or Pause a song, fade the song in or out.",
+                "allow_comments": "Allow people to comment on my profile page."
+            },
+            "connect": {
+                "description": "Connect your accounts to share music with ease and enhance your experience.",
+                "connect_spotify": "Connect my Spotify Account"
+            }
+        },
+        "user": {
+            "my_profile_overview": "My Profile",
+            "user_profile_overview": "{name}'s Profile",
+            "my_tracks": "My Tracks",
+            "user_tracks": "{name}'s Tracks",
+            "my_adventures": "My Adventures",
+            "user_adventures": "{name}'s Adventures",
+            "my_podcasts": "My Podcasts",
+            "user_podcasts": "{name}'s Podcasts",
+            "my_playlists": "My Playlists",
+            "user_playlists": "{name}'s Playlists",
+            "no_tracks": "{name} hasn't uploaded any Tracks yet",
+            "no_adventures": "{name} hasn't uploaded any Adventures yet",
+            "no_playlists": "{name} has no Playlists yet",
+            "no_podcasts": "{name} hasn't uploaded any Podcasts yet",
+            "no_following": "You don't follow anyone",
+            "user_no_followers": "{name} has no followers",
+            "recent_tracks": "Recent Tracks",
+            "favorites": "Favorites",
+            "total_plays": "Total Plays",
+            "my_orders": {
+                "title": "My Orders",
+                "tabs": {
+                    "orders": "Orders ({count})",
+                    "subscriptions": "Subscriptions ({count})"
+                },
+                "no_orders": "You haven't made any purchases yet",
+                "status": "Status: {status}",
+                "amount": "Amount: {amount}",
+                "last_payment_date": "Last payment date: {date}",
+                "next_payment_date": "Next payment date: {date}"
+            },
+            "my_favorites": {
+                "title": "My Favorites",
+                "tabs": {
+                    "songs": "Songs ({count})",
+                    "adventures": "Adventures ({count})",
+                    "playlists": "Playlists ({count})",
+                    "podcasts": "Podcasts ({count})",
+                    "episodes": "Episodes ({count})",
+                    "users": "Users ({count})"
+                },
+                "no_favorites": "You haven't added any favorites yet"
+            },
+            "followers": {
+                "default": "Followers",
+                "my": "My Followers",
+                "free": "Free Followers",
+                "patrons": "Patrons",
+                "other": "{name}'s Followers",
+                "all_count": "All Followers ({count})",
+                "patrons_count": "Patrons ({count})",
+                "free_count": "Free Followers ({count})"
+            },
+            "following": "Following",
+            "stats": {
+                "tracks": "Tracks",
+                "adventures": "Adventures",
+                "playlists": "Playlists"
+            },
+            "notifications": {
+                "title": "Notifications",
+                "my_notifications": "My Notifications",
+                "no_notifications": "You don't have any unread Notifications",
+                "no_recent_actions": "You don't have any unread Recent actions",
+                "recent_actions": "Recent actions"
+            }
+        },
+        "playlist": {
+            "songs": "Songs",
+            "subscribers": "Subscribers",
+            "duration": "Duration",
+            "tabs": {
+                "overview": "Overview",
+                "subscribers": "Subscribers ({count})",
+                "collaborators": "Collaborators ({count})",
+                "related": "Related Playlists"
+            },
+            "menus": {
+                "share": "Share",
+                "add_playlist": "Add to Playlist",
+                "report": "Report a problem",
+                "manage_collaborative": "Manage Collaborative Mode",
+                "make_collaborative": "Make collaborative",
+                "disable_collaborative": "Disable collaborative",
+                "invite_collaborators": "Invite collaborators",
+                "remove_from_playlist": "Remove from playlist"
+            },
+            "recent_activity": "Recent Activity"
+        },
+        "search": {
+            "title": "Search results: {query}",
+            "users": "Users",
+            "not_found": "Nothing was found",
+            "songs": "Songs"
+        },
+        "adventure": {
+            "total_tracks": "Total Tracks"
+        }
+    },
+    "footer": {
+        "privacy": "Privacy",
+        "cookie": "Cookie",
+        "copyrights": "Copyrights",
+        "terms": "Terms"
+    },
+    "modals": {
+        "adult_only_warning": "The site contains information that is not recommended for persons under the age of majority.",
+        "are_you_adult": "Are you over 18 years old?",
+        "signup_agreement": "I'm over 18 and I agree to the Terms of Service",
+        "custom_username": "Set custom username?",
+        "reset_password": "Reset Password?",
+        "reset_password_message": "Don't worry, we'll send an email with instructions to access your account. Unless you remember?",
+        "feedback": "Leave Feedback",
+        "feedback_message": "Found a problem with our player or want to report a bug? Fill out this form and we'll check it out.",
+        "i_feel": "I feel",
+        "feedback_about": "Feedback is about",
+        "share_thoughts": "Share your thoughts",
+        "create_podcast": "Create podcast",
+        "upload": {
+            "track": "Upload Track",
+            "podcast": {
+                "title": "Upload Podcast Episode",
+                "select": "Select Podcast, Season and Episode",
+                "season": "Season {index}",
+                "episode": "Episode {index}"
+            },
+            "adventure": {
+                "title": "Upload Adventure",
+                "heading": "Heading",
+                "root": "Root {index}",
+                "final": "Final {index}",
+                "uploading_heading": "Uploading Heading track",
+                "uploading_root": "Uploading {index} Root & Final tracks"
+            },
+            "characters_allowed": "{used} out of {max} Maximum characters allowed",
+            "image_description": {
+                "line_1": "Artwork Dimensions:",
+                "line_2": "Preferred: 1500x1500px,",
+                "line_3": "Minimum: 500x500px"
+            },
+            "select_file": "Select File",
+            "input_details": "Input Details"
+        },
+        "share": {
+            "embed": {
+                "title": "Embed"
+            },
+            "facebook": {
+                "title": "Facebook",
+                "description": "Clicking share below will open a new window to share on Facebook"
+            },
+            "twitter": {
+                "title": "Twitter",
+                "description": "Write a Tweet"
+            },
+            "more": {
+                "title": "More",
+                "description": "Clicking on the networks below will open a new window",
+                "buttons": {
+                    "reddit": "Reddit",
+                    "pinterest": "Pinterest",
+                    "linked_in": "LinkedIn",
+                    "email": "Email"
+                }
+            },
+            "texts": {
+                "song": "Listening to {name} by {author}. {link}",
+                "playlist": "Listening to the playlist {name} by {author}. {link}",
+                "user": "Follow me! {link}",
+                "podcast": "Listening to the podcast {name} by {author}. {link}",
+                "episode": "Listening to podcast episode {name} by {author}. {link}",
+                "adventure": "Listening to the adventure playlist {name} by {author}. {link}"
+            },
+            "copied": "Copied to clipboard",
+            "nothing_to_copy": "Nothing to copy"
+        },
+        "playlist": {
+            "title": "New Playlist"
+        },
+        "delete_profile": {
+            "title": "Are you sure you want to delete your account?",
+            "description": "Deleting your account will permanently remove all your personal information and data associated with it. This action cannot be undone. Please be aware that you will lose access to all features and services provided by our platform."
+        },
+        "delete": {
+            "title": "Delete {type}?",
+            "description": "Are you sure you want to delete {title}?"
+        },
+        "invite_collaborators": {
+            "title": "Invite Collaborators"
+        },
+        "subscription": {
+            "title": "Need Subscription",
+            "description": "Upgrade to Access This Feature",
+            "message": "This feature is only available for subscribers. Login to your premium account or upgrade your account to get access to this and lots of other awesome features."
+        },
+        "report": {
+            "title": "Report",
+            "description": "You can report after selecting a problem.",
+            "wrong_author": "This track wasn't recorded by the artist shown",
+            "audio_problem": "There's an audio problem",
+            "undesirable_content": "Undesirable content"
+        },
+        "adventure": {
+            "title": "Adventure Map",
+            "heading": "Heading track",
+            "roots": "Roots",
+            "root": "Root {index}",
+            "finals": "Finals",
+            "final": "Finals {index}"
+        },
+        "adventure_branch": {
+            "title": "Select Next Track"
+        }
+    },
+    "buttons": {
+        "filters": "Filters",
+        "cancel": "Cancel",
+        "back": "Back",
+        "delete": "Delete",
+        "delete_account": "Delete Account",
+        "confirm_delete_account": "Yes, Delete My Account",
+        "yes": "Yes",
+        "no": "No",
+        "clear": "Clear",
+        "submit": "Submit",
+        "save": "Save",
+        "login": "Login",
+        "sign_up": "Sign Up",
+        "no_account": "No account?",
+        "reset_password": "Reset Your Password",
+        "has_18": "I am over 18",
+        "not_18": "I am under 18",
+        "save_changes": "Save Changes",
+        "subscribe": "Subscribe",
+        "unsubscribe": "Unsubscribe",
+        "subscribe_site": "Subscribe to the Site",
+        "activate_subscription": "Activate Subscription",
+        "suspend_subscription": "Suspend Subscription",
+        "cancel_subscription": "Cancel Subscription",
+        "select_photo": "Select photo",
+        "all_notifications": "View All Notifications",
+        "reply": "Reply",
+        "show": "Show",
+        "follow": "Follow",
+        "unfollow": "Unfollow",
+        "linktree": {
+            "default": "Linktree",
+            "set": "Set Linktree",
+            "not_set": "No Linktree",
+            "visit": "Visit Linktree",
+            "remove": "Remove Linktree",
+            "change": "Change Linktree"
+        },
+        "patron": {
+            "set": "Become a Patron",
+            "cancel": "Cancel a Patron",
+            "suspend": "Suspend a Patron",
+            "activate": "Activate a Patron"
+        },
+        "upload": {
+            "default": "Upload",
+            "track": "Upload Track",
+            "adventure": "Upload Adventure",
+            "podcast_episode": "Upload Podcast episode",
+            "select_artwork": "Select Artwork"
+        },
+        "create": {
+            "title": "Create",
+            "playlist": "Create Playlist",
+            "podcast": "Create Podcast"
+        },
+        "load_more": "Load More",
+        "buy_now": "Buy Now",
+        "change_password": "Change Password",
+        "edit": "Edit",
+        "copy": "Copy",
+        "invite": "Invite",
+        "accept": "Accept",
+        "decline": "Decline",
+        "download": "Download",
+        "standard": "Standard",
+        "proceed": "Proceed",
+        "upload_heading_proceed": "Upload Heading & Proceed",
+        "upload_root_finals": "Upload {index} Root & Finals",
+        "high_quality": "High Quality",
+        "share": {
+            "title": "Share",
+            "size": {
+                "picture": "Picture",
+                "classic": "Classic",
+                "mini": "Mini"
+            }
+        },
+        "show_map": "Show Adventure map"
+    },
+    "events": {
+        "follow_user": "{user} is now following {title}.",
+        "follow_playlist": "{user} subscribed to playlist {title}.",
+        "follow_podcast": "{user} subscribed to podcast {title}.",
+        "comment": "{user} commented on {title}.",
+        "reply_comment": "{user} replied to your comment on {title}.",
+        "comment_mentioned": "{user} mentioned you in comment",
+        "invite_collaborate": "{user} invited you to collaborate a playlist {title}.",
+        "accepted_collaboration": "{user} accepted your invitation to collaborate a playlist {title}.",
+        "add_to_playlist": "{user} added track to a playlist {title}.",
+        "add_song": "{user} added a new track {title}.",
+        "add_episode": "{user} added a new episode {title}.",
+        "favorite_song": "{user} added a track {title} to favorites.",
+        "favorite_album": "{user} added an album {title} to favorites.",
+        "favorite_episode": "{user} added a podcast episode {title} to favorites.",
+        "collect_song": "{user} added a track {title} to collection.",
+        "remove_from_podcast": "{user} removed an episode {title} from podcast.",
+        "remove_from_playlist": "{user} removed a track {title} from playlist."
+    },
+    "misc": {
+        "sign_in": "Sign In",
+        "sign_up": "Sign Up",
+        "email": "Email",
+        "name": "Name",
+        "username": "Username",
+        "password": "Password",
+        "retype_password": "Retype Password",
+        "back": "Back",
+        "comments_disabled": "Comments are disabled here",
+        "no_comments": "Be the first to comment!",
+        "login_to_comment": "Log in to comment!",
+        "filters_selected": "{count} Filters Selected",
+        "search": "Search",
+        "choose_role": "I want to signup as:",
+        "roles": {
+            "listener": {
+                "name": "Listener",
+                "description": "Listener can create playlists, subscribe or patron Creators, comment and add to favorites. Listener can't get premium subscription and can't upload audios"
+            },
+            "creator": {
+                "name": "Creator",
+                "description": "Creator can do everything that Listener does + get premium subscription and upload audios"
+            }
+        },
+        "summary": "Summary: {text}",
+        "month": "month",
+        "select_track": "Select Track",
+        "title": "Title",
+        "artwork": "Artwork",
+        "description": "Description",
+        "script": "Script",
+        "gender": "Gender",
+        "genres": "Genre(s)",
+        "tags": "Tags",
+        "release_at": "Release At",
+        "schedule_publish": "Schedule publish",
+        "make_public": "Make Public",
+        "allow_comments": "Allow Comments",
+        "allow_download": "Allow Download",
+        "explicit": "Explicit",
+        "patrons_only": "Only for Patrons",
+        "notify_fans": "Notify my Fans",
+        "please_wait": "Please, wait...",
+        "loading": "Loading...",
+        "playlist_artwork": "Playlist Artwork",
+        "you_sure": "Are you sure?",
+        "my_playlists": "My playlists",
+        "collaborated_playlists": "Collaborated playlists",
+        "likes": "Likes",
+        "roots": "Roots",
+        "finals": "Finals",
+        "work_in_progress": "Work in progress",
+        "categories": "Categories",
+        "podcast": "Podcast",
+        "season": "Season",
+        "episode_number": "Episode number",
+        "select_file": "Select File",
+        "country": "Country",
+        "language": "Language",
+        "misc": "Miscellaneous"
+    }
+}

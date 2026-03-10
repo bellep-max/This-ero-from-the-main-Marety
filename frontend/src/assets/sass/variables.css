@@ -1,0 +1,38 @@
+:root {
+    --primary-color: #e836c5;
+    --hover-color: #921178;
+    --active-color: #886aff;
+    --pink-color: #ffb997;
+    --pink-color-2: #e88d67;
+    --green-color: #ccf5ac;
+    --dark-color: #3b413c;
+    --yellow-color: #ffd910;
+
+    --secondary-color: #1a0054;
+    --primary-gradient: linear-gradient(to right, #ff25f5, #886aff);
+    --white: #fff;
+    --grey-light: #e0e0e0;
+    --grey-mid: #868686;
+    --gray-dark: #5a5c69;
+    --light-color: #fff9fb;
+    --light-hover: #ffebf1;
+    --text-color: #0a0410;
+
+    --default-text-color: #0a0410;
+    --light-text-color: #fff9fb;
+
+    --background-gradient:
+        linear-gradient(0deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.11) 100%),
+        linear-gradient(209deg, #ba2a9b 4.5%, #c20f6e 49.42%, #8644b3 97.5%);
+
+    &[data-bs-theme='dark'] {
+        --primary-color: #921178;
+        --hover-color: #e836c5;
+
+        --default-text-color: #fff9fb;
+
+        --background-gradient:
+            linear-gradient(0deg, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.75) 100%),
+            linear-gradient(209deg, #ba2a9b 4.5%, #c20f6e 49.42%, #8644b3 97.5%);
+    }
+}
