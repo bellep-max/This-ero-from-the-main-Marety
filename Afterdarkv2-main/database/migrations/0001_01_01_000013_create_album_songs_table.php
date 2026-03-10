@@ -1,0 +1,27 @@
+<?php
+
+use App\Models\Album;
+use App\Models\Song;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        if (!Schema::hasTable('album_songs')) {
+            Schema::create('album_songs', function (Blueprint $table) {
+                $table->id();
+                $table->foreignIdFor(Song::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+                $table->foreignIdFor(Album::class)->constrained()->cascadeOnUpdate()->cascadeOnDelete();
+                $table->smallInteger('priority')->default(0);
+                $table->timestamps();
+            });
+        }
+    }
+    public function down(): void
+    {
+        Schema::dropIfExists('album_songs');
+    }
+};

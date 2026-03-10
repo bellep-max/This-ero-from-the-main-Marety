@@ -1,0 +1,43 @@
+<?php
+
+// config/ziggy.php
+
+return [
+    'only' => [
+        'account.*',
+        'actions.store',
+        'adventures.*',
+        'album.*',
+        'auth.*',
+        'artist.*',
+        'backend.dashboard',
+        'channels.*',
+        'comments.*',
+        'discover.*',
+        'downloads.*',
+        'episodes.*',
+        'feeds.*',
+        'genres.*',
+        'home.index',
+        'login.*',
+        'logout',
+        'notifications.*',
+        'podcasts.*',
+        'posts.*',
+        'pages.*',
+        'playlists.*',
+        'profiles.*',
+        'register.store',
+        'report.store',
+        'search.show',
+        'settings.*',
+        'share.embed',
+        'songs.*',
+        'song.*',
+        'streams.*',
+        'terms.accept',
+        'trending.*',
+        'upload.*',
+        'users.*',
+    ],
+];

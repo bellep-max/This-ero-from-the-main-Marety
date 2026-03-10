@@ -1,0 +1,48 @@
+@extends('index')
+@section('content')
+    <div class="bg-gradient-default py-3 p-md-5 p-lg-6 min-vh-100">
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-xl-3 pb-3 pb-xl-0">
+                    @include('frontend.default.profile.layout.menu')
+                </div>
+                <div class="col col-xl-9">
+                    <div class="d-flex flex-column w-100 gap-4 bg-light rounded-5 p-3 p-lg-5 vh-100">
+                        <div class="d-flex flex-row justify-content-start align-items-center gap-4">
+                            @if (auth()->id() === $profile->id)
+                                <a id="episode-upload" data-id="{{ $podcast->id }}"
+                                   class="btn-default btn-outline btn-rnd border-2">
+                                    <svg width="15" height="15" xmlns="http://www.w3.org/2000/svg"
+                                         viewBox="0 0 448 512">
+                                        <!--!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.-->
+                                        <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 144L48 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l144 0 0 144c0 17.7 14.3 32 32 32s32-14.3 32-32l0-144 144 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-144 0 0-144z"/>
+                                    </svg>
+                                </a>
+                                <a id="edit-podcast"
+                                   href="{{ route('frontend.user.podcasts.edit', ['user' => $profile, 'podcastVisible' => $podcast]) }}"
+                                   class="btn-default btn-outline btn-rnd border-2">
+                                    <svg width="15" height="15" xmlns="http://www.w3.org/2000/svg"
+                                         viewBox="0 0 512 512">
+                                        <!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.-->
+                                        <path d="M441 58.9L453.1 71c9.4 9.4 9.4 24.6 0 33.9L424 134.1 377.9 88 407 58.9c9.4-9.4 24.6-9.4 33.9 0zM209.8 256.2L344 121.9 390.1 168 255.8 302.2c-2.9 2.9-6.5 5-10.4 6.1l-58.5 16.7 16.7-58.5c1.1-3.9 3.2-7.5 6.1-10.4zM373.1 25L175.8 222.2c-8.7 8.7-15 19.4-18.3 31.1l-28.6 100c-2.4 8.4-.1 17.4 6.1 23.6s15.2 8.5 23.6 6.1l100-28.6c11.8-3.4 22.5-9.7 31.1-18.3L487 138.9c28.1-28.1 28.1-73.7 0-101.8L474.9 25C446.8-3.1 401.2-3.1 373.1 25zM88 64C39.4 64 0 103.4 0 152L0 424c0 48.6 39.4 88 88 88l272 0c48.6 0 88-39.4 88-88l0-112c0-13.3-10.7-24-24-24s-24 10.7-24 24l0 112c0 22.1-17.9 40-40 40L88 464c-22.1 0-40-17.9-40-40l0-272c0-22.1 17.9-40 40-40l112 0c13.3 0 24-10.7 24-24s-10.7-24-24-24L88 64z"/>
+                                    </svg>
+                                </a>
+                            @endif
+                            <div class="font-default fs-4">
+                                Episodes: {{ \Illuminate\Support\Str::limit($podcast->title, 25) }}
+                            </div>
+                        </div>
+                        <div class="container-fluid">
+                            <div id="podcasts-grid" class="row gy-3 overflow-y-auto">
+                                @foreach ($podcast->episodes as $episode)
+                                    @include('frontend.components.podcast-episode-card', ['episode' => $episode])
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+@endsection

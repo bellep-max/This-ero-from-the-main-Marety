@@ -1,0 +1,16 @@
+// Fonts
+@import url('https://fonts.bunny.net/css?family=Nunito');
+@import url(https://fonts.bunny.net/css?family=montserrat:400,500,700,800);
+@import url('https://fonts.cdnfonts.com/css/merge-one');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '../../../../node_modules/bootstrap/scss/bootstrap';
+@import '../../../../node_modules/bootstrap-vue-next/dist/bootstrap-vue-next.css';
+
+//custom
+@import 'variables.css';
+@import 'layout.css';
+@import 'range_input.css';

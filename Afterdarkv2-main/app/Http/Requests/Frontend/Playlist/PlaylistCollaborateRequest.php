@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Http\Requests\Frontend\Playlist;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class PlaylistCollaborateRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     *
+     * @return bool
+     */
+    public function authorize()
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     */
+    public function rules(): array
+    {
+        return [
+            'collaborator_uuid' => [
+                'required',
+                'uuid',
+                'exists:users,uuid',
+            ],
+        ];
+    }
+}
