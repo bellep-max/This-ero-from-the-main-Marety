@@ -17,6 +17,12 @@ class AddCacheHeaders
     {
         $response = $next($request);
 
+        if (app()->environment('local')) {
+            $response->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+            $response->header('Pragma', 'no-cache');
+            return $response;
+        }
+
         if ($request->isMethod('GET') && $response->isSuccessful()) {
             $response->header('Cache-Control', 'public, max-age=3600');
             $response->setEtag(md5($response->getContent()));
