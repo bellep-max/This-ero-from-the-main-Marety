@@ -17,11 +17,7 @@ return new class extends Migration
             $table->foreignIdFor(User::class)->constrained()->cascadeOnDelete()->cascadeOnUpdate();
             $table->integer('commentable_id')->nullable()->index();
             $table->string('commentable_type', 50)->nullable()->index();
-            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
-                $table->text('content')->nullable()->collation('utf8mb4_bin');
-            } else {
-                $table->text('content')->nullable();
-            }
+            $table->text('content')->nullable();
             $table->tinyInteger('edited')->default(0);
             $table->string('ip', 46)->nullable();
             $table->mediumInteger('reaction_count')->default(0);

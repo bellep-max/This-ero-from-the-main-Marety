@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         $connection = Schema::getConnection();
@@ -38,7 +35,6 @@ return new class extends Migration
         });
 
         Schema::table('musicengine_subscriptions', function (Blueprint $table) use ($connection) {
-            // Check if 'status' column exists, if not use 'payment_status'
             $hasStatus = $this->columnExists($connection, 'musicengine_subscriptions', 'status');
             $statusColumn = $hasStatus ? 'status' : 'payment_status';
             $indexName = 'subscriptions_user_id_' . $statusColumn . '_next_billing_date_index';
@@ -64,23 +60,40 @@ return new class extends Migration
 
     private function indexExists($connection, $table, $indexName): bool
     {
-        $database = $connection->getDatabaseName();
-        $result = $connection->select(
-            "SELECT COUNT(*) as count FROM information_schema.statistics
-             WHERE table_schema = ? AND table_name = ? AND index_name = ?",
-            [$database, $table, $indexName]
-        );
+        $driver = $connection->getDriverName();
+        if ($driver === 'pgsql') {
+            $result = $connection->select(
+                "SELECT COUNT(*) as count FROM pg_indexes WHERE tablename = ? AND indexname = ?",
+                [$table, $indexName]
+            );
+        } else {
+            $database = $connection->getDatabaseName();
+            $result = $connection->select(
+                "SELECT COUNT(*) as count FROM information_schema.statistics
+                 WHERE table_schema = ? AND table_name = ? AND index_name = ?",
+                [$database, $table, $indexName]
+            );
+        }
         return $result[0]->count > 0;
     }
 
     private function columnExists($connection, $table, $column): bool
     {
-        $database = $connection->getDatabaseName();
-        $result = $connection->select(
-            "SELECT COUNT(*) as count FROM information_schema.columns
-             WHERE table_schema = ? AND table_name = ? AND column_name = ?",
-            [$database, $table, $column]
-        );
+        $driver = $connection->getDriverName();
+        if ($driver === 'pgsql') {
+            $result = $connection->select(
+                "SELECT COUNT(*) as count FROM information_schema.columns
+                 WHERE table_schema = 'public' AND table_name = ? AND column_name = ?",
+                [$table, $column]
+            );
+        } else {
+            $database = $connection->getDatabaseName();
+            $result = $connection->select(
+                "SELECT COUNT(*) as count FROM information_schema.columns
+                 WHERE table_schema = ? AND table_name = ? AND column_name = ?",
+                [$database, $table, $column]
+            );
+        }
         return $result[0]->count > 0;
     }
 

@@ -16,15 +16,19 @@ class PayPalInit extends Command
 
     public PayPal $provider;
 
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     /**
      * @throws Throwable
      */
-    public function __construct()
+    protected function initProvider(): void
     {
         $this->provider = new PayPal;
         $this->provider->setApiCredentials(config('paypal'));
         $this->provider->getAccessToken();
-        parent::__construct();
     }
 
     /**
@@ -112,6 +116,7 @@ class PayPalInit extends Command
     public function handle(): int
     {
         try {
+            $this->initProvider();
             if (config('app.env') !== 'local') {
                 $webhooks = $this->provider->listWebHooks()['webhooks'];
                 $webhook = !count($webhooks) ? $this->provider->createWebHook(config('app.url') . '/paypal/webhook', ['*']) : $webhooks[0];
