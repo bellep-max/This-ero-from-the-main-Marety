@@ -1,0 +1,1 @@
+import{D as t,E as a,G as l,O as n}from"./@vue-DqVXLkkv.js";const u={__name:"RoundButton",props:{classList:{required:!1,default:""}},setup(e){return(s,o)=>(t(),a("button",{class:n(["btn-default btn-rounded",e.classList])},[l(s.$slots,"default")],2))}};export{u as default};

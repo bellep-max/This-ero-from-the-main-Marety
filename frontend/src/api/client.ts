@@ -9,6 +9,18 @@ const apiClient = axios.create({
     withCredentials: true,
 });
 
+apiClient.interceptors.response.use(
+    (response) => {
+        if (response.data && typeof response.data === 'object' && 'success' in response.data && 'data' in response.data) {
+            response.data = response.data.data;
+        }
+        return response;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 export async function getCsrfCookie(): Promise<void> {
     await axios.get('/sanctum/csrf-cookie', { withCredentials: true });
 }

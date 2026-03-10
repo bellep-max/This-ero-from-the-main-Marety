@@ -10,6 +10,7 @@ export default defineConfig({
         port: 5000,
         hmr: {
             clientPort: 443,
+            protocol: 'wss',
         },
         allowedHosts: true,
         proxy: {

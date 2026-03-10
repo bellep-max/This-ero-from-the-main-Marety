@@ -95,6 +95,10 @@ class AppServiceProvider extends ServiceProvider
             return Limit::perMinute(5)->by($request->ip());
         });
 
+        RateLimiter::for('api', function (Request $request) {
+            return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
+        });
+
         Gate::policy(MESubscription::class, SubscriptionPolicy::class);
         Gate::policy(Playlist::class, PlaylistPolicy::class);
         Gate::policy(Song::class, SongPolicy::class);

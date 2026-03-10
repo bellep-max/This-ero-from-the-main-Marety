@@ -113,6 +113,8 @@ import router from '@/router';
 import i18n from './i18n';
 import clickOutsideDirective from './Directives/ClickOutsideDirective';
 import { initializeTheme } from './composables/useAppearance';
+import { route } from './helpers/route';
+import { useForm } from './helpers/useForm';
 
 library.add(
     faFile,
@@ -228,6 +230,10 @@ app.directive('b-toggle', vBToggle);
 app.directive('b-tooltip', vBTooltip);
 app.component('vue-multiselect', VueMultiselect);
 app.component('font-awesome-icon', FontAwesomeIcon);
+
+app.config.globalProperties.$route_helper = route;
+(window as any).route = route;
+(window as any).useForm = useForm;
 
 app.mount('#app');
 

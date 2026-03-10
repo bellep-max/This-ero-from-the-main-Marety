@@ -11,4 +11,7 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }
+  export interface GlobalDirectives {
+    vBToggle: typeof import('bootstrap-vue-next/directives/BToggle')['vBToggle']
+  }
 }

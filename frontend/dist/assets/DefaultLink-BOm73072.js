@@ -1,0 +1,1 @@
+import{D as t,E as r,G as a,O as l}from"./@vue-DqVXLkkv.js";const n=["href"],c={__name:"DefaultLink",props:{link:{type:String,required:!0},classList:{type:String,required:!1}},setup(e){return(s,i)=>(t(),r("a",{class:l(e.classList),href:e.link},[a(s.$slots,"default")],10,n))}};export{c as default};
