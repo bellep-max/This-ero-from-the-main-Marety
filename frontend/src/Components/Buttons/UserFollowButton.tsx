@@ -13,7 +13,7 @@ export default function UserFollowButton({ user, isFollowing, onToggle }: UserFo
     const handleToggle = async () => {
         try {
             if (isFollowing) {
-                await apiClient.delete(FOLLOWERS_API.DELETE(user.id));
+                await apiClient.delete(FOLLOWERS_API.DELETE, { data: { uuid: user.uuid } });
                 onToggle?.(false);
             } else {
                 await apiClient.post(FOLLOWERS_API.STORE, { uuid: user.uuid });

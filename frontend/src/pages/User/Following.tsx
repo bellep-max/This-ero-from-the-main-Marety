@@ -30,8 +30,8 @@ export default function UserFollowing() {
 
   const handleUnfollow = useCallback(async (targetUser: any) => {
     try {
-      await apiClient.delete(FOLLOWING_API.DELETE(targetUser.uuid), {
-        data: { user_uuid: targetUser.uuid },
+      await apiClient.delete(FOLLOWING_API.DELETE, {
+        data: { uuid: targetUser.uuid },
       });
       setFollowing((prev) => prev.filter((u) => u.uuid !== targetUser.uuid));
     } catch (error) {

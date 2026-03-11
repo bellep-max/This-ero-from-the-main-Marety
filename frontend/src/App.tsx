@@ -57,8 +57,12 @@ export default function App() {
     const fetchInitData = useAppStore((s) => s.fetchInitData);
 
     useEffect(() => {
-        fetchUser();
-        fetchInitData();
+        fetchInitData().then(() => {
+            const authState = useAuthStore.getState();
+            if (authState.isLogged && authState.user) {
+                fetchUser();
+            }
+        });
     }, []);
 
     return (

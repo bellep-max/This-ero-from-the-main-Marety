@@ -45,7 +45,8 @@
                 "play_next": "Play next",
                 "play_last": "Play last"
             }
-        }
+        },
+        "logout": "Logout"
     },
     "pages": {
         "home": {
@@ -512,7 +513,8 @@
                 "mini": "Mini"
             }
         },
-        "show_map": "Show Adventure map"
+        "show_map": "Show Adventure map",
+        "signup": "Sign Up"
     },
     "events": {
         "follow_user": "{user} is now following {title}.",

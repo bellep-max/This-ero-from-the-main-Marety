@@ -60,7 +60,7 @@ export default function Header() {
                     <Navbar.Collapse id="nav-collapse">
                         <Nav className="d-flex flex-row align-items-center gap-2 gap-lg-3 ms-auto">
                             {menu?.map((item) => (
-                                <Nav.Link as={Link} to={item.route} key={item.key} className="header-link">
+                                <Nav.Link as={Link} to={item.path || item.route} key={item.key} className="header-link">
                                     {$t(item.key)}
                                 </Nav.Link>
                             ))}
@@ -98,7 +98,7 @@ export default function Header() {
                                             )}
                                             <Dropdown.Divider />
                                             {userMenu?.map((item: any) => (
-                                                <Dropdown.Item as={Link} to={item.route} key={item.key}>
+                                                <Dropdown.Item as={Link} to={item.path || item.route} key={item.key}>
                                                     {$t(item.key)}
                                                 </Dropdown.Item>
                                             ))}
@@ -110,10 +110,10 @@ export default function Header() {
                             ) : (
                                 <>
                                     <DefaultButton classList="btn-outline" onClick={() => setShowLogin(true)}>
-                                        {$t('menus.login')}
+                                        {$t('buttons.login')}
                                     </DefaultButton>
                                     <DefaultButton classList="btn-pink" onClick={() => setShowSignup(true)}>
-                                        {$t('menus.signup')}
+                                        {$t('buttons.signup', 'Sign Up')}
                                     </DefaultButton>
                                 </>
                             )}

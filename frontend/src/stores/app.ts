@@ -1,9 +1,10 @@
 import { create } from 'zustand';
 import apiClient from '@/api/client';
 import { INIT } from '@/api/endpoints';
+import { useAuthStore } from '@/stores/auth';
 
 export interface MenuItem {
-    route: string;
+    path: string;
     active: boolean;
     key: string;
     permissions: string | null;
@@ -63,6 +64,21 @@ export const useAppStore = create<AppState>((set) => ({
                 initialized: true,
                 loading: false,
             });
+
+            if (data.auth) {
+                const authStore = useAuthStore.getState();
+                if (!authStore.authLoaded) {
+                    useAuthStore.setState({
+                        isAdult: data.auth.is_adult ?? false,
+                        user: data.auth.user ?? null,
+                        isLogged: !!data.auth.user,
+                        pageMenu: data.auth.pageMenu ?? [],
+                        userMenu: data.auth.userMenu ?? [],
+                        authLoaded: true,
+                        loading: false,
+                    });
+                }
+            }
         } catch (error) {
             console.error('Failed to load init data:', error);
             set({ loading: false });
