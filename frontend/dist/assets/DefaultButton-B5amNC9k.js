@@ -1,0 +1,1 @@
+import{j as e}from"./react-7zqVQZSl.js";function b({classList:t,className:n,disabled:o,type:u="button",onClick:s,children:a}){return e.jsx("button",{type:u,className:`btn btn-default ${t||n||""}`,disabled:o,onClick:s,children:a})}export{b as D};

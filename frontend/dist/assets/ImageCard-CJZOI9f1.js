@@ -1,1 +1,0 @@
-import{j as a}from"./react-C-JWr5h6.js";function n({model:r,route:t,title:e}){const s=r?{background:`url(${r.artwork})`}:{},i=e??(r==null?void 0:r.title)??"";return a.jsx("a",{href:t,className:"hoverable-image",style:s,children:a.jsx("div",{className:"hoverable-image-title",children:i})})}export{n as I};

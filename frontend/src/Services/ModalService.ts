@@ -1,28 +1,11 @@
-import { useModal } from 'vue-final-modal';
-
-export const showModal = async (modal: any, initAttrs: Record<string, any> = {}, props?: any) => {
-    const { open, close } = useModal({
-        component: modal,
-        attrs: {
-            data: props,
-            onClose() {
-                close();
-            },
-            onConfirm() {
-                close();
-            },
-        },
-    });
-
-    return await open();
+export const showModal = async (_modal: any, _initAttrs: Record<string, any> = {}, _props?: any) => {
+    // In React, modals are controlled via state (show/onClose props).
+    // This service is kept for backward compatibility but is a no-op.
+    console.warn('ModalService.showModal is a no-op in React. Use component state to control modals.');
 };
 
-export const hideModal = async (modal: any, initAttrs: Record<string, any> = {}) => {
-    const { close } = useModal({
-        component: modal,
-    });
-
-    return await close();
+export const hideModal = async (_modal: any, _initAttrs: Record<string, any> = {}) => {
+    console.warn('ModalService.hideModal is a no-op in React. Use component state to control modals.');
 };
 
 export default { showModal, hideModal };

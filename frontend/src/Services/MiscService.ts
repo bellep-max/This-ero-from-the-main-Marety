@@ -1,19 +1,9 @@
-import { useModal } from 'vue-final-modal';
-
-export const showModal = async (modal: any, initAttrs: Record<string, any> = {}) => {
-    const { open } = useModal({
-        component: modal,
-    });
-
-    return await open();
+export const showModal = async (_modal: any, _initAttrs: Record<string, any> = {}) => {
+    console.warn('MiscService.showModal is a no-op in React. Use component state to control modals.');
 };
 
-export const hideModal = async (modal: any, initAttrs: Record<string, any> = {}) => {
-    const { close } = useModal({
-        component: modal,
-    });
-
-    return await close();
+export const hideModal = async (_modal: any, _initAttrs: Record<string, any> = {}) => {
+    console.warn('MiscService.hideModal is a no-op in React. Use component state to control modals.');
 };
 
 export const isNotEmpty = (model: any): boolean => {

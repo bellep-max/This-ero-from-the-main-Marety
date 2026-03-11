@@ -1,0 +1,1 @@
+import{j as i}from"./react-7zqVQZSl.js";import{a as n,N as u,P as p}from"./swiper-ClxXuDwP.js";function w({config:t={},children:o,className:a}){const e=t.itemsToShow==="auto"?"auto":t.itemsToShow??3,s=t.wrapAround??!0,r=t.gap??24;return i.jsx(n,{modules:[u,p],slidesPerView:e,loop:s,spaceBetween:r,navigation:!0,className:a,style:{padding:"0.25rem 0"},children:o})}export{w as D};
