@@ -1,1 +1,0 @@
-import{aw as s}from"./@fortawesome-DZfOoW3O.js";import{D as a,J as r,O as t,u as c}from"./@vue-DqVXLkkv.js";const u={__name:"Icon",props:{icon:{required:!0,type:Array},classList:{required:!1,type:String},size:{type:String,default:"xl"}},setup(e){return(i,n)=>(a(),r(c(s),{icon:e.icon,class:t(e.classList),size:e.size},null,8,["icon","class","size"]))}};export{u as default};

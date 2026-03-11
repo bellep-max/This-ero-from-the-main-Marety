@@ -1,1 +1,0 @@
-import{a as t}from"./index-BeVQDSRe.js";import{F as o}from"./auth-BZbwYP22.js";const r=async a=>{await t.post(o.STORE,{uuid:a.uuid,type:a.type})},e=async a=>{await t.delete(o.STORE,{data:{uuid:a.uuid,type:a.type}})};export{r as a,e as r};

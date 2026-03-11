@@ -1,5 +1,4 @@
-import { defineStore } from 'pinia';
-import { computed, ref } from 'vue';
+import { create } from 'zustand';
 import apiClient, { getCsrfCookie } from '@/api/client';
 import { AUTH } from '@/api/endpoints';
 
@@ -16,73 +15,72 @@ export interface AuthUser {
     podcasts: any[];
     approvedCollaboratedPlaylists: any[];
     unreadNotifications: any[];
+    unread_notifications: any[];
+    role: string;
+    subscription: any;
     [key: string]: any;
 }
 
-export const useAuthStore = defineStore('auth', () => {
-    const user = ref<AuthUser | null>(null);
-    const isAdult = ref(false);
-    const pageMenu = ref<any[]>([]);
-    const userMenu = ref<any[]>([]);
-    const loading = ref(false);
+interface AuthState {
+    user: AuthUser | null;
+    isAdult: boolean;
+    authLoaded: boolean;
+    pageMenu: any[];
+    userMenu: any[];
+    loading: boolean;
+    isLogged: boolean;
+    isOwner: (uuid: string) => boolean;
+    fetchUser: () => Promise<void>;
+    login: (credentials: { email: string; password: string; remember?: boolean }) => Promise<any>;
+    register: (data: Record<string, any>) => Promise<any>;
+    logout: () => Promise<void>;
+}
 
-    const isLogged = computed(() => user.value !== null);
+export const useAuthStore = create<AuthState>((set, get) => ({
+    user: null,
+    isAdult: false,
+    authLoaded: false,
+    pageMenu: [],
+    userMenu: [],
+    loading: false,
+    isLogged: false,
 
-    function isOwner(uuid: string): boolean {
-        return user.value?.uuid === uuid;
-    }
+    isOwner: (uuid: string) => get().user?.uuid === uuid,
 
-    async function fetchUser() {
-        loading.value = true;
+    fetchUser: async () => {
+        set({ loading: true });
         try {
             const response = await apiClient.get(AUTH.USER);
-            user.value = response.data.user;
-            isAdult.value = response.data.is_adult ?? false;
-            pageMenu.value = response.data.pageMenu ?? [];
-            userMenu.value = response.data.userMenu ?? [];
+            set({
+                user: response.data.user,
+                isAdult: response.data.is_adult ?? false,
+                authLoaded: true,
+                pageMenu: response.data.pageMenu ?? [],
+                userMenu: response.data.userMenu ?? [],
+                isLogged: true,
+                loading: false,
+            });
         } catch {
-            user.value = null;
-            isAdult.value = false;
-            pageMenu.value = [];
-            userMenu.value = [];
-        } finally {
-            loading.value = false;
+            set({ user: null, isAdult: false, authLoaded: true, pageMenu: [], userMenu: [], isLogged: false, loading: false });
         }
-    }
+    },
 
-    async function login(credentials: { email: string; password: string; remember?: boolean }) {
+    login: async (credentials) => {
         await getCsrfCookie();
         const response = await apiClient.post(AUTH.LOGIN, credentials);
-        user.value = response.data.user;
+        set({ user: response.data.user, isLogged: true });
         return response.data;
-    }
+    },
 
-    async function register(data: Record<string, any>) {
+    register: async (data) => {
         await getCsrfCookie();
         const response = await apiClient.post(AUTH.REGISTER, data);
-        user.value = response.data.user;
+        set({ user: response.data.user, isLogged: true });
         return response.data;
-    }
+    },
 
-    async function logout() {
+    logout: async () => {
         await apiClient.post(AUTH.LOGOUT);
-        user.value = null;
-        isAdult.value = false;
-        pageMenu.value = [];
-        userMenu.value = [];
-    }
-
-    return {
-        user,
-        isAdult,
-        pageMenu,
-        userMenu,
-        loading,
-        isLogged,
-        isOwner,
-        fetchUser,
-        login,
-        register,
-        logout,
-    };
-});
+        set({ user: null, isAdult: false, pageMenu: [], userMenu: [], isLogged: false });
+    },
+}));

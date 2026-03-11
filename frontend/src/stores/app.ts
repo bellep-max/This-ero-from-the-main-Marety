@@ -1,5 +1,4 @@
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { create } from 'zustand';
 import apiClient from '@/api/client';
 import { INIT } from '@/api/endpoints';
 
@@ -19,60 +18,56 @@ export interface FilterPresets {
     countries: any[];
 }
 
-export const useAppStore = defineStore('app', () => {
-    const appName = ref('');
-    const menu = ref<MenuItem[]>([]);
-    const filterPresets = ref<FilterPresets>({
+interface AppState {
+    appName: string;
+    menu: MenuItem[];
+    filterPresets: FilterPresets;
+    flashMessage: string | null;
+    version: string | null;
+    loading: boolean;
+    initialized: boolean;
+    fetchInitData: () => Promise<void>;
+    clearFlashMessage: () => void;
+}
+
+export const useAppStore = create<AppState>((set) => ({
+    appName: '',
+    menu: [],
+    filterPresets: {
         tags: [],
         genres: [],
         vocals: [],
         podcast_categories: [],
         languages: [],
         countries: [],
-    });
-    const flashMessage = ref<string | null>(null);
-    const version = ref<string | null>(null);
-    const loading = ref(false);
-    const initialized = ref(false);
+    },
+    flashMessage: null,
+    version: null,
+    loading: false,
+    initialized: false,
 
-    async function fetchInitData() {
-        loading.value = true;
+    fetchInitData: async () => {
+        set({ loading: true });
         try {
             const response = await apiClient.get(INIT);
             const data = response.data;
-            appName.value = data.name ?? '';
-            menu.value = data.menu ?? [];
-            filterPresets.value = data.filter_presets ?? {
-                tags: [],
-                genres: [],
-                vocals: [],
-                podcast_categories: [],
-                languages: [],
-                countries: [],
-            };
-            flashMessage.value = data.flash_message ?? null;
-            version.value = data.version ?? null;
-            initialized.value = true;
+            set({
+                appName: data.name ?? '',
+                menu: data.menu ?? [],
+                filterPresets: data.filter_presets ?? {
+                    tags: [], genres: [], vocals: [],
+                    podcast_categories: [], languages: [], countries: [],
+                },
+                flashMessage: data.flash_message ?? null,
+                version: data.version ?? null,
+                initialized: true,
+                loading: false,
+            });
         } catch (error) {
             console.error('Failed to load init data:', error);
-        } finally {
-            loading.value = false;
+            set({ loading: false });
         }
-    }
+    },
 
-    function clearFlashMessage() {
-        flashMessage.value = null;
-    }
-
-    return {
-        appName,
-        menu,
-        filterPresets,
-        flashMessage,
-        version,
-        loading,
-        initialized,
-        fetchInitData,
-        clearFlashMessage,
-    };
-});
+    clearFlashMessage: () => set({ flashMessage: null }),
+}));

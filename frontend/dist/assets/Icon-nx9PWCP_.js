@@ -1,0 +1,1 @@
+import{j as m}from"./react-C-JWr5h6.js";import{aA as n}from"./@fortawesome-WQWyPXaZ.js";function c({icon:o,classList:s,className:r,...t}){return m.jsx(n,{icon:o,className:s||r||"",...t})}export{c as I};

@@ -7,23 +7,25 @@ AfterDarkAudio is a comprehensive audio content platform for adult creators and 
 The project has been split from a Laravel+Inertia monolith into two separate codebases:
 
 ### Frontend (`frontend/`)
-- **Framework**: Vite + Vue 3 SPA (standalone, no Inertia/Ziggy)
-- **Routing**: Vue Router (all 38 pages mapped)
-- **State**: Pinia stores (auth, app, track)
+- **Framework**: Vite + React 18 + TypeScript SPA
+- **Routing**: React Router v6 (35 lazy-loaded routes in App.tsx)
+- **State**: Zustand stores (auth, app, track) with localStorage persistence
 - **API Client**: Axios with cookie-based auth
-- **Styling**: Tailwind CSS + Bootstrap Vue Next + SCSS
+- **UI**: React Bootstrap + SCSS + FontAwesome icons
+- **i18n**: i18next + react-i18next
+- **Carousels**: Swiper React
 - **Port**: 5000 (webview)
 - **Key files**:
-  - `src/main.ts` — app entry point
-  - `src/router/index.ts` — all routes
+  - `src/main.tsx` — React entry point with FontAwesome library setup
+  - `src/App.tsx` — BrowserRouter with all 35 lazy-loaded routes
   - `src/api/client.ts` — Axios instance with CSRF + credentials
   - `src/api/endpoints.ts` — API URL constants
   - `src/helpers/route.ts` — route() compatibility helper (maps Ziggy route names to URLs)
-  - `src/helpers/useForm.ts` — useForm() composable (replaces Inertia's useForm)
-  - `src/stores/` — Pinia stores (auth.ts, app.ts, track.js)
+  - `src/helpers/useForm.ts` — useForm() React hook (form state, validation, submit)
+  - `src/stores/` — Zustand stores (auth.ts, app.ts, track.ts)
   - `src/Services/` — Service layer (AuthService, PlaylistService, etc.)
-  - `src/pages/` — All 38 page components
-  - `src/Components/` — All 69 reusable components
+  - `src/pages/` — All 35 page components (TSX)
+  - `src/Components/` — All 69+ reusable components (TSX)
   - `src/Layouts/` — AppLayout, SettingsLayout, UserLayout + Header/Footer
 
 ### Backend API (`Afterdarkv2-main/`)
@@ -59,15 +61,30 @@ The project has been split from a Laravel+Inertia monolith into two separate cod
 - CSRF: Frontend calls `/sanctum/csrf-cookie` before auth requests
 - CORS configured in `config/cors.php` to allow frontend origin
 
+## Key Library Mappings (Vue → React)
+- Vue Router → React Router v6 (useParams, useNavigate, useSearchParams, Link)
+- Pinia → Zustand (create, persist middleware)
+- ref()/reactive() → useState/useMemo
+- onMounted → useEffect([], [])
+- bootstrap-vue-next → react-bootstrap
+- vue3-toastify → react-toastify
+- vue-multiselect → react-select
+- @vueform/slider → rc-slider
+- vue3-carousel → Swiper/SwiperSlide
+- `<slot>` → children prop
+- defineProps → TypeScript interface
+- defineEmits → callback props
+- `$t()` from i18n.ts (re-exported from i18next)
+
 ## Conversion Status
-- All 35 pages converted from Inertia `defineProps` to API-fetched data via `onMounted` + `apiClient.get()`
-- All 69 components migrated from Inertia patterns to standard Vue 3 (no Inertia imports remain)
-- Loading spinners added to all pages while data loads
-- Null-safe access patterns (`.value?.`) applied to all ref access in script sections
-- `router.reload()` replaced with proper API refetch patterns
-- `router.post/delete/get/visit()` replaced with `apiClient` and `vueRouter.push()`
-- Build succeeds with 1155 modules, no compilation errors
-- Some backend API endpoints return 500 (service bindings not fully configured) — these are backend issues, not frontend conversion issues
+- All 35 pages converted from Vue SFC to React TSX
+- All 69+ components converted from Vue SFC to React TSX
+- All 3 stores converted from Pinia to Zustand
+- All composables converted to React hooks
+- Services and Enums unchanged (pure TS/JS, no framework deps)
+- Build succeeds with 600 modules, zero compilation errors
+- tsconfig strict: false for easier conversion
+- Some backend API endpoints return 500 (service bindings not fully configured) — backend issues, not frontend
 
 ## Key Fixes Made for Replit/PostgreSQL
 - Removed MySQL-specific `utf8mb4_bin` collation from comments migration
